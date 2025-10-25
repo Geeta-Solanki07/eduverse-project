@@ -5,6 +5,13 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
+interface Errors {
+  name: string;
+  email: string;
+  password: string;
+  confirm: string;
+  api: string;
+}
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -15,12 +22,12 @@ export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({ name: "", email: "", password: "", confirm: "", api: "" });
+  const [errors, setErrors] = useState<Errors>({ name: "", email: "", password: "", confirm: "", api: "" });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let valid = true;
-    const newErrors = { name: "", email: "", password: "", confirm: "", api: "" };
+    const newErrors: Errors = { name: "", email: "", password: "", confirm: "", api: "" };
 
     if (!name.trim()) { newErrors.name = "Name is required"; valid = false; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { newErrors.email = "Please enter a valid email"; valid = false; }
@@ -37,10 +44,11 @@ export default function RegisterForm() {
         alert("Registered successfully! Please login.");
         router.push("/auth/login");
       } else {
-        setErrors(prev => ({ ...prev, api: res.data.message }));
+        setErrors(prev => ({ ...prev, api: res.data.message || "Registration failed" }));
       }
-    } catch (err: any) {
-      setErrors(prev => ({ ...prev, api: "Server error, try again later" }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Server error, try again later";
+      setErrors(prev => ({ ...prev, api: message }));
     } finally {
       setLoading(false);
     }
@@ -48,10 +56,9 @@ export default function RegisterForm() {
 
   return (
     <>
-
-  
       {errors.api && <p className="text-red-500 text-center mb-2">{errors.api}</p>}
       <form onSubmit={handleSubmit} className="space-y-5 text-black">
+        {/* Name */}
         <div className="relative">
           <input
             type="text"
@@ -63,6 +70,7 @@ export default function RegisterForm() {
           {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
         </div>
 
+        {/* Email */}
         <div className="relative">
           <input
             type="email"
@@ -74,6 +82,7 @@ export default function RegisterForm() {
           {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
         </div>
 
+        {/* Password */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -91,6 +100,7 @@ export default function RegisterForm() {
           {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
         </div>
 
+        {/* Confirm Password */}
         <div className="relative">
           <input
             type={showConfirm ? "text" : "password"}
@@ -108,6 +118,7 @@ export default function RegisterForm() {
           {errors.confirm && <p className="text-red-500 text-sm">{errors.confirm}</p>}
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
@@ -119,4 +130,3 @@ export default function RegisterForm() {
     </>
   );
 }
-
