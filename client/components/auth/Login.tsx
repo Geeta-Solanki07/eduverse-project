@@ -41,7 +41,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+    <div className="max-w-md mx-auto bg-white text-black p-8 rounded-2xl shadow-xl border border-gray-100">
       <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">
         Welcome Back 👋
       </h2>
