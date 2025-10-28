@@ -86,56 +86,38 @@ export default function TestimonialsSection() {
             </p>
           </div>
 
-          <div className="flex items-center gap-4 mt-6">
+          {/* Person Info */}
+          <div className="mt-8 flex items-center gap-4">
             <Image
               src={testiImg}
               alt={testimonials[current].name}
               width={60}
               height={60}
-              className="rounded-full border-2 border-orange-400"
-              priority
+              className="rounded-full border-2 border-orange-500"
             />
             <div>
-              <p className="font-semibold text-orange-600">
+              <h4 className="text-xl font-semibold text-gray-900">
                 {testimonials[current].name}
-              </p>
-              <p className="text-gray-500 text-sm">
-                {testimonials[current].title}
-              </p>
+              </h4>
+              <p className="text-gray-500">{testimonials[current].title}</p>
             </div>
           </div>
         </div>
 
-        {/* Navigation Arrows */}
-        <button
-          onClick={prevTestimonial}
-          aria-label="Previous Testimonial"
-          className="absolute top-1/2 -translate-y-1/2 left-0 bg-orange-300 text-white p-3 rounded-full shadow hover:bg-orange-500 transition"
-        >
-          &#8592;
-        </button>
-        <button
-          onClick={nextTestimonial}
-          aria-label="Next Testimonial"
-          className="absolute top-1/2 -translate-y-1/2 right-0 bg-orange-300 text-white p-3 rounded-full shadow hover:bg-orange-500 transition"
-        >
-          &#8594;
-        </button>
-
-        {/* Dots Indicators */}
-        <div className="flex justify-center mt-6 gap-3">
-          {testimonials.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrent(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === current
-                  ? "bg-orange-600 scale-110"
-                  : "bg-orange-200"
-              }`}
-              aria-label={`Go to testimonial ${index + 1}`}
-            />
-          ))}
+        {/* Navigation Buttons */}
+        <div className="flex justify-center gap-6 mt-8">
+          <button
+            onClick={prevTestimonial}
+            className="bg-orange-500 text-white w-10 h-10 rounded-full hover:bg-orange-600 transition"
+          >
+            ‹
+          </button>
+          <button
+            onClick={nextTestimonial}
+            className="bg-orange-500 text-white w-10 h-10 rounded-full hover:bg-orange-600 transition"
+          >
+            ›
+          </button>
         </div>
       </div>
     </section>

@@ -1,10 +1,132 @@
 "use client";
-import RegisterForm from "@/components/auth/RegisterForm";
 
-export default function RegisterPage() {
+import { useState } from "react";
+import { FiEye, FiEyeOff, FiUser, FiMail, FiLock } from "react-icons/fi";
+import api from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+
+export default function RegisterForm() {
+  const router = useRouter();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setLoading(true);
+
+    try {
+      const res = await api.post("/auth/register", form);
+      if (res.status === 201 || res.status === 200) {
+        router.push("/login");
+      }
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.message || "Registration failed!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <RegisterForm />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white shadow-2xl rounded-3xl p-8 max-w-md w-full"
+      >
+        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-4">
+          Create Your Account
+        </h2>
+        <p className="text-gray-500 text-center mb-6">
+          Join our Eduverse community today 🚀
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name */}
+          <div className="relative">
+            <FiUser className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              className="w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+
+          {/* Email */}
+          <div className="relative">
+            <FiMail className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+
+          {/* Password */}
+          <div className="relative">
+            <FiLock className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type={showPass ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+            <div
+              onClick={() => setShowPass(!showPass)}
+              className="absolute right-3 top-3 text-gray-400 cursor-pointer"
+            >
+              {showPass ? <FiEyeOff /> : <FiEye />}
+            </div>
+          </div>
+
+          {/* Error message */}
+          {errorMsg && (
+            <p className="text-red-500 text-sm text-center">{errorMsg}</p>
+          )}
+
+          {/* Submit button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white font-semibold py-2 rounded-lg hover:bg-indigo-700 transition duration-300"
+          >
+            {loading ? "Creating Account..." : "Register"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Already have an account?{" "}
+          <span
+            onClick={() => router.push("/login")}
+            className="text-indigo-600 font-semibold hover:underline cursor-pointer"
+          >
+            Login here
+          </span>
+        </p>
+      </motion.div>
     </div>
   );
 }

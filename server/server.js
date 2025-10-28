@@ -2,30 +2,46 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 
 dotenv.config();
-
 const app = express();
-app.use(cors());
+
+// ✅ Allowed Origins
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://eduverse-project.vercel.app",
+];
+
+// ✅ Middleware
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+app.use(cookieParser());
 
-// ✅ Default route for test
-app.get("/", (req, res) => {
-  res.send("Eduverse API is running ✅");
-});
+// ✅ MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// ✅ Use auth routes
+// ✅ Routes
 app.use("/auth", authRoutes);
 
-const PORT = process.env.PORT || 5000;
+// Health check
+app.get("/", (req, res) => res.send("Eduverse Backend Running ✅"));
 
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-  })
-  .catch((err) => console.log("❌ MongoDB Error:", err.message));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

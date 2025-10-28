@@ -13,27 +13,27 @@ const faqs = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept credit/debit cards, PayPal, and bank transfers. All transactions are secure and encrypted.",
+      "We accept credit/debit cards, UPI, PayPal, and bank transfers. All transactions are secure and encrypted.",
   },
   {
     question: "Can I access courses on mobile devices?",
     answer:
-      "Yes! Our platform is responsive on smartphones and tablets. Download our mobile app for an optimized experience.",
+      "Yes! Our platform is fully responsive and available on mobile browsers for an optimized learning experience.",
   },
   {
     question: "How do I get my course certificate?",
     answer:
-      "Certificates are generated automatically upon successful course completion. Download from your dashboard or request a physical copy.",
+      "Certificates are generated automatically after successful course completion. You can download them from your dashboard.",
   },
   {
     question: "What if I need help with course content?",
     answer:
-      "Each course has dedicated instructors and assistants. Ask questions in forums, schedule 1:1 sessions, or attend live Q&A.",
+      "Each course has dedicated instructors and assistants. You can ask questions in discussion forums or contact support directly.",
   },
   {
-    question: "What's your refund policy?",
+    question: "What’s your refund policy?",
     answer:
-      "We offer a 14-day money-back guarantee for most courses if less than 20% of content is completed.",
+      "We offer a 14-day money-back guarantee if you’ve completed less than 20% of the course content.",
   },
 ];
 
@@ -47,14 +47,14 @@ const supportOptions = [
   {
     icon: "fas fa-envelope",
     title: "Email Support",
-    text: "We'll respond within 24 hours.",
-    link: "mailto:support@dousoft.com",
+    text: "We’ll respond within 24 hours.",
+    link: "mailto:dousoftit@gmail.com",
   },
   {
     icon: "fas fa-phone-alt",
     title: "Call Us",
-    text: "Speak directly with support.",
-    link: "tel:+01523456789",
+    text: "Speak directly with our support team.",
+    link: "tel:+917734996636",
   },
   {
     icon: "fas fa-comments",
@@ -63,21 +63,49 @@ const supportOptions = [
     link: "#",
   },
   {
-    icon: "fas fa-book",
-    title: "Documentation",
-    text: "Access guides and tutorials.",
-    link: "#",
+    icon: "fas fa-map-marker-alt",
+    title: "Visit Office",
+    text: "Meet us at our Jaipur headquarters.",
+    link: "https://maps.app.goo.gl/EQXrUmXxomExoM8y8",
   },
   {
-    icon: "fas fa-users",
-    title: "Community Forum",
-    text: "Connect with other learners.",
+    icon: "fas fa-book",
+    title: "Documentation",
+    text: "Access detailed guides and tutorials.",
     link: "#",
   },
 ];
 
 const SupportPage: React.FC = () => {
   const [faqActive, setFaqActive] = useState<number | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      subject: (form.elements.namedItem("subject") as HTMLSelectElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
+    try {
+      const res = await fetch("http://localhost:5000/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert("✅ Message sent successfully!");
+        form.reset();
+      } else {
+        alert("⚠️ " + result.error);
+      }
+    } catch (err) {
+      alert("❌ Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <div className="font-poppins bg-gray-50 min-h-screen text-black">
@@ -102,7 +130,7 @@ const SupportPage: React.FC = () => {
             How Can We Help You?
           </h1>
           <p className="text-lg text-black mb-8">
-            Find answers to your questions or contact our support team. We&apos;re here to assist you with any issues.
+            Find answers to your questions or contact our team. We&apos;re here to assist you.
           </p>
           <div className="flex items-center justify-center gap-2 max-w-md mx-auto">
             <input
@@ -129,6 +157,8 @@ const SupportPage: React.FC = () => {
             <p className="text-gray-600 text-sm">{item.text}</p>
             <a
               href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-orange-600 font-medium hover:underline flex items-center gap-1"
             >
               Learn More <i className="fas fa-arrow-right"></i>
@@ -168,32 +198,17 @@ const SupportPage: React.FC = () => {
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-orange-600 mb-2">CONTACT US</h2>
           <h3 className="text-2xl font-medium mb-6">Still Need Help?</h3>
-          <form className="flex flex-col gap-4">
-            <input
-              type="text"
-              placeholder="Full Name"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none"
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email Address"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none"
-              required
-            />
-            <select className="w-full px-4 py-3 border rounded-xl focus:outline-none">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <input name="name" type="text" placeholder="Full Name" className="w-full px-4 py-3 border rounded-xl focus:outline-none" required />
+            <input name="email" type="email" placeholder="Email Address" className="w-full px-4 py-3 border rounded-xl focus:outline-none" required />
+            <select name="subject" className="w-full px-4 py-3 border rounded-xl focus:outline-none">
               <option>Technical Support</option>
               <option>Billing Inquiry</option>
               <option>Course Content</option>
               <option>Feedback/Suggestions</option>
               <option>Other</option>
             </select>
-            <textarea
-              placeholder="Your Message"
-              className="w-full px-4 py-3 border rounded-xl focus:outline-none"
-              rows={6}
-              required
-            ></textarea>
+            <textarea name="message" placeholder="Your Message" className="w-full px-4 py-3 border rounded-xl focus:outline-none" rows={6} required></textarea>
             <button className="w-full py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition">
               Send Message
             </button>
