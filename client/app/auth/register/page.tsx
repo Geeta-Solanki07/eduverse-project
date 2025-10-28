@@ -3,11 +3,9 @@
 import { useState } from "react";
 import { FiEye, FiEyeOff, FiUser, FiMail, FiLock } from "react-icons/fi";
 import api from "@/lib/api";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 export default function RegisterForm() {
-  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -16,6 +14,7 @@ export default function RegisterForm() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,12 +23,14 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    setSuccessMsg("");
     setLoading(true);
 
     try {
       const res = await api.post("/auth/register", form);
       if (res.status === 201 || res.status === 200) {
-        router.push("/login");
+        setSuccessMsg("✅ Registration successful! Please login to continue.");
+        setForm({ name: "", email: "", password: "" });
       }
     } catch (err: any) {
       setErrorMsg(err.response?.data?.message || "Registration failed!");
@@ -102,7 +103,10 @@ export default function RegisterForm() {
             </div>
           </div>
 
-          {/* Error message */}
+          {/* Success / Error message */}
+          {successMsg && (
+            <p className="text-green-600 text-sm text-center">{successMsg}</p>
+          )}
           {errorMsg && (
             <p className="text-red-500 text-sm text-center">{errorMsg}</p>
           )}
@@ -120,8 +124,8 @@ export default function RegisterForm() {
         <p className="text-center text-sm text-gray-500 mt-4">
           Already have an account?{" "}
           <span
-            onClick={() => router.push("/login")}
             className="text-indigo-600 font-semibold hover:underline cursor-pointer"
+            onClick={() => (window.location.href = "/auth/login")}
           >
             Login here
           </span>

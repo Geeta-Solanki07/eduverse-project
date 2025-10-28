@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiCheckCircle } from "react-icons/fi";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -12,6 +12,7 @@ export default function LoginForm() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,12 +21,15 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
+    setSuccessMsg("");
     setLoading(true);
 
     try {
       const res = await api.post("/auth/login", form);
+
       if (res.status === 200) {
-        router.push("/dashboard"); // Redirect after login success
+        setSuccessMsg("🎉 Login successful! Redirecting...");
+        setTimeout(() => router.push("/dashboard"), 1500); // redirect after 1.5 sec
       }
     } catch (err: any) {
       setErrorMsg(err.response?.data?.message || "Invalid credentials!");
@@ -94,6 +98,13 @@ export default function LoginForm() {
             <p className="text-red-500 text-sm text-center">{errorMsg}</p>
           )}
 
+          {/* Success message */}
+          {successMsg && (
+            <p className="text-green-600 text-sm text-center flex justify-center items-center gap-2">
+              <FiCheckCircle /> {successMsg}
+            </p>
+          )}
+
           {/* Login button */}
           <button
             type="submit"
@@ -108,7 +119,7 @@ export default function LoginForm() {
         <p className="text-center text-sm text-gray-500 mt-4">
           Don’t have an account?{" "}
           <span
-            onClick={() => router.push("/register")}
+            onClick={() => router.push("/auth/register")}
             className="text-indigo-600 font-semibold hover:underline cursor-pointer"
           >
             Register here
