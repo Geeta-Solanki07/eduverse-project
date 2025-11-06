@@ -1,18 +1,10 @@
-"use client";
-
-export default function DashboardCards() {
-  const data = [
-    { title: "Users", value: 120 },
-    { title: "Courses", value: 14 },
-    { title: "Revenue", value: "₹45,200" },
-  ];
-
+export default function DashboardCards({ stats }: { stats: { title:string; value:string|number }[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-      {data.map((d) => (
-        <div key={d.title} className="p-6 bg-white rounded shadow">
-          <div className="text-sm text-gray-500">{d.title}</div>
-          <div className="text-2xl font-bold mt-2">{d.value}</div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {stats.map((s,i)=>(
+        <div key={i} className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
+          <h3 className="text-gray-500">{s.title}</h3>
+          <p className="text-2xl font-bold">{s.value}</p>
         </div>
       ))}
     </div>

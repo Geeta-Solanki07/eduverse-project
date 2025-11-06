@@ -1,34 +1,29 @@
 import express from "express";
-import User from "../models/User.js";
+import { verifyAdmin } from "../middlewares/authMiddleware.js";
 import Course from "../models/Course.js";
-import { verifyToken, isAdmin } from "../middleware/auth.js";
+
 const router = express.Router();
 
-// admin get all users
-router.get("/users", verifyToken, isAdmin, async (req, res) => {
-  const users = await User.find().select("-password");
-  res.json({ success:true, users });
+// ✅ Only Admin can add courses
+router.post("/add-course", verifyAdmin, async (req, res) => {
+  try {
+    const newCourse = new Course(req.body);
+    await newCourse.save();
+    res.json({ message: "Course added successfully", course: newCourse });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding course" });
+  }
 });
 
-// delete user
-router.delete("/users/:id", verifyToken, isAdmin, async (req, res) => {
-  await User.findByIdAndDelete(req.params.id);
-  res.json({ success:true, message: "User deleted" });
-});
-
-// courses CRUD (example)
-router.get("/courses", verifyToken, isAdmin, async (req, res) => {
+// ✅ All courses (public)
+router.get("/courses", async (req, res) => {
   const courses = await Course.find();
-  res.json({ success:true, courses });
+  res.json(courses);
 });
-router.post("/courses", verifyToken, isAdmin, async (req, res) => {
-  const { title, description, price } = req.body;
-  const c = await Course.create({ title, description, price, createdBy: req.user.id });
-  res.json({ success:true, course: c });
-});
-router.delete("/courses/:id", verifyToken, isAdmin, async (req, res) => {
+
+router.delete("/delete/:id", verifyAdmin, async (req, res) => {
   await Course.findByIdAndDelete(req.params.id);
-  res.json({ success:true });
+  res.json({ message: "Course deleted" });
 });
 
 export default router;

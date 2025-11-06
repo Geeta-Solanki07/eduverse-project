@@ -2,16 +2,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get('token')?.value;
-  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
+  const token = req.cookies.get("token")?.value;
+  const url = req.nextUrl.clone();
 
-  if(isAdminRoute){
-    if(!token){
-      return NextResponse.redirect(new URL('/auth/login', req.url));
+  if (req.nextUrl.pathname.startsWith("/admin")) {
+    // if no token -> redirect to login
+    if (!token) {
+      url.pathname = "/auth/login";
+      return NextResponse.redirect(url);
     }
-    // optional: we could call verify API to check role, but middleware is lightweight - else just allow and check on server-side rendered data
   }
   return NextResponse.next();
 }
 
-export const config = { matcher: ['/admin/:path*'] };
+export const config = { matcher: ["/admin/:path*"] };

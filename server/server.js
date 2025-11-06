@@ -1,36 +1,40 @@
 import express from "express";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/auth.js";
+
+import authRoutes from "./routes/authRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 
 dotenv.config();
-
 const app = express();
 
-// ✅ Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ CORS setup (VERY IMPORTANT)
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "https://eduverse-project.vercel.app"],
-    credentials: true,
-  })
-);
+const CLIENT = process.env.CLIENT_URL || "http://localhost:3000";
+app.use(cors({ origin: [CLIENT], credentials: true }));
 
-// ✅ Test route
-app.get("/", (req, res) => res.send("Eduverse API running ✅"));
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/courses", courseRoutes);
 
-// ✅ Routes
-app.use("/auth", authRoutes);
+// Health
+app.get("/", (req, res) => res.send("Eduverse API running 🚀"));
 
-// ✅ PORT and DB connection
+// 404 logger (helps debug)
+app.use((req, res) => {
+  console.log("Route not found:", req.originalUrl);
+  res.status(404).json({ message: "Route not found" });
+});
+
+// DB + Start
 const PORT = process.env.PORT || 5000;
-
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => app.listen(PORT, () => console.log(`✅ Server running on ${PORT}`)))
-  .catch((err) => console.log("❌ DB error:", err.message));
+  .then(() => {
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
+  })
+  .catch((e) => console.error("MongoDB connection error:", e.message));
