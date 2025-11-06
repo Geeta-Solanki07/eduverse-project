@@ -13,40 +13,45 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Allowed origins
+// ✅ Explicitly allow both origins
 const allowedOrigins = [
-  "http://localhost:3000",                 // local dev
-  "https://eduverse-project.vercel.app",   // live frontend
+  "http://localhost:3000",
+  "https://eduverse-project.vercel.app",
 ];
 
-// ✅ CORS config
+// ✅ CORS middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed"));
-      }
-    },
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
+
+// ✅ Handle preflight requests (OPTIONS)
+app.options("*", cors());
 
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 
-// Health check
-app.get("/", (req, res) => res.send("Eduverse API running 🚀"));
+// ✅ Debug: handle old route
+app.use("/it-courses", (req, res) => {
+  res.status(404).json({ message: "Please use /api/courses instead" });
+});
 
-// 404 route
+// ✅ Health check
+app.get("/", (req, res) => {
+  res.send("Eduverse API running 🚀");
+});
+
+// ✅ 404 handler
 app.use((req, res) => {
   console.log("Route not found:", req.originalUrl);
   res.status(404).json({ message: "Route not found" });
 });
 
-// ✅ MongoDB + Start server
+// ✅ MongoDB connection
 const PORT = process.env.PORT || 5000;
 mongoose
   .connect(process.env.MONGO_URI)
