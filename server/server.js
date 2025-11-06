@@ -13,23 +13,40 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const CLIENT = process.env.CLIENT_URL || "http://localhost:3000";
-app.use(cors({ origin: [CLIENT], credentials: true }));
+// ✅ Allowed origins
+const allowedOrigins = [
+  "http://localhost:3000",                 // local dev
+  "https://eduverse-project.vercel.app",   // live frontend
+];
 
-// Routes
+// ✅ CORS config
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 
-// Health
+// Health check
 app.get("/", (req, res) => res.send("Eduverse API running 🚀"));
 
-// 404 logger (helps debug)
+// 404 route
 app.use((req, res) => {
   console.log("Route not found:", req.originalUrl);
   res.status(404).json({ message: "Route not found" });
 });
 
-// DB + Start
+// ✅ MongoDB + Start server
 const PORT = process.env.PORT || 5000;
 mongoose
   .connect(process.env.MONGO_URI)
