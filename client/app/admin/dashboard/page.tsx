@@ -1,61 +1,99 @@
 "use client";
+
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { FaUsers, FaBookOpen, FaMoneyBillWave } from "react-icons/fa";
 import api from "@/lib/api";
-import Link from "next/link";
 
-export default function AdminDashboard(){
-  const [courses,setCourses] = useState<any[]>([]);
-  const [loading,setLoading] = useState(true);
+interface DashboardStats {
+  users: number;
+  courses: number;
+  revenue: number;
+}
 
-  useEffect(()=>{
-    api.get("/api/courses").then(r=>{ setCourses(r.data); }).catch(e=>console.error(e)).finally(()=>setLoading(false));
-  },[]);
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<DashboardStats>({
+    users: 0,
+    courses: 0,
+    revenue: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const deleteCourse = async (id:string)=>{
-    if(!confirm("Delete?")) return;
-    try {
-      await api.delete(`/api/courses/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }});
-      setCourses(prev=>prev.filter(c=>c._id !== id));
-    } catch (err:any){ alert(err.response?.data?.message || "Delete failed"); }
-  };
+  // Fetch Dashboard Data from Backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await api.get("/api/admin/stats", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStats(res.data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if(loading) return <div className="p-6">Loading...</div>;
+    fetchData();
+  }, []);
 
-  const totalValue = courses.reduce((s,c)=>s + (Number(c.price)||0), 0);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl font-semibold text-gray-600">
+        Loading Dashboard...
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-orange-600">Admin Dashboard</h1>
-        <Link href="/admin/add-course" className="bg-orange-500 text-white px-4 py-2 rounded">+ Add Course</Link>
-      </div>
+    <div className="p-8 min-h-screen bg-gradient-to-b from-orange-50 to-white">
+      <h1 className="text-4xl font-bold text-center text-orange-600 mb-8">
+        Admin Dashboard
+      </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-white rounded shadow"><div className="text-sm text-gray-500">Total Courses</div><div className="text-2xl font-bold">{courses.length}</div></div>
-        <div className="p-4 bg-white rounded shadow"><div className="text-sm text-gray-500">Approx Value</div><div className="text-2xl font-bold">₹{totalValue.toLocaleString()}</div></div>
-        <div className="p-4 bg-white rounded shadow"><div className="text-sm text-gray-500">Recent</div><div className="text-2xl font-bold">Last 7d</div></div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {courses.map(c => (
-          <div key={c._id} className="bg-white rounded p-4 shadow">
-            <div className="flex gap-4">
-              <img src={c.image || "/assets/default-course.png"} alt={c.title} className="w-28 h-20 object-cover rounded"/>
-              <div className="flex-1">
-                <h2 className="font-semibold">{c.title}</h2>
-                <p className="text-sm text-gray-600 line-clamp-2">{c.summary}</p>
-                <div className="mt-2 flex justify-between items-center">
-                  <div className="text-orange-600 font-bold">₹{Number(c.price).toLocaleString()}</div>
-                  <div className="flex gap-2">
-                    <Link href={`/admin/edit-course/${c._id}`} className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded">Edit</Link>
-                    <button onClick={()=>deleteCourse(c._id)} className="px-3 py-1 bg-red-50 text-red-600 rounded">Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="text-xs text-gray-400 mt-3">Added: {new Date(c.createdAt).toLocaleString()}</div>
+      <div className="grid md:grid-cols-3 gap-6">
+        {/* Users Card */}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="bg-white shadow-lg p-6 rounded-2xl border border-gray-100 flex items-center justify-between"
+        >
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700">Total Users</h2>
+            <p className="text-3xl font-bold text-orange-600 mt-2">
+              {stats.users}
+            </p>
           </div>
-        ))}
+          <FaUsers className="text-5xl text-orange-400" />
+        </motion.div>
+
+        {/* Courses Card */}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="bg-white shadow-lg p-6 rounded-2xl border border-gray-100 flex items-center justify-between"
+        >
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700">Courses</h2>
+            <p className="text-3xl font-bold text-orange-600 mt-2">
+              {stats.courses}
+            </p>
+          </div>
+          <FaBookOpen className="text-5xl text-orange-400" />
+        </motion.div>
+
+        {/* Revenue Card */}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          className="bg-white shadow-lg p-6 rounded-2xl border border-gray-100 flex items-center justify-between"
+        >
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700">Revenue</h2>
+            <p className="text-3xl font-bold text-orange-600 mt-2">
+              ₹{stats.revenue.toLocaleString()}
+            </p>
+          </div>
+          <FaMoneyBillWave className="text-5xl text-orange-400" />
+        </motion.div>
       </div>
     </div>
   );

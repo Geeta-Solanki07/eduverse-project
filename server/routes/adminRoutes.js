@@ -1,14 +1,19 @@
 import express from "express";
+import User from "../models/User.js";
+import Course from "../models/Course.js";
 import { verifyAdmin } from "../middleware/authMiddleware.js";
-import { getUsers, deleteUser, addCourse, getCourses, updateCourse, deleteCourse } from "../controllers/adminController.js";
+
 const router = express.Router();
 
-router.get("/users", verifyAdmin, getUsers);
-router.delete("/users/:id", verifyAdmin, deleteUser);
-
-router.post("/courses", verifyAdmin, addCourse);
-router.get("/courses", getCourses); // public
-router.put("/courses/:id", verifyAdmin, updateCourse);
-router.delete("/courses/:id", verifyAdmin, deleteCourse);
+router.get("/stats", verifyAdmin, async (req, res) => {
+  try {
+    const users = await User.countDocuments();
+    const courses = await Course.countDocuments();
+    const revenue = courses * 2500; // Example calculation
+    res.json({ users, courses, revenue });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 export default router;
