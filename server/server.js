@@ -10,53 +10,70 @@ import courseRoutes from "./routes/courseRoutes.js";
 dotenv.config();
 const app = express();
 
+// ✅ Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Explicitly allow both origins
+// ✅ Allowed origins (for local + deployed frontend)
 const allowedOrigins = [
   "http://localhost:3000",
   "https://eduverse-project.vercel.app",
 ];
 
-// ✅ CORS middleware
+// ✅ CORS setup
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
 
-// ✅ Handle preflight requests (OPTIONS)
+// ✅ Preflight requests (important for Render)
 app.options("*", cors());
 
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 
-// ✅ Debug: handle old route
-app.use("/it-courses", (req, res) => {
-  res.status(404).json({ message: "Please use /api/courses instead" });
-});
-
-// ✅ Health check
+// ✅ Root route
 app.get("/", (req, res) => {
   res.send("Eduverse API running 🚀");
 });
 
-// ✅ 404 handler
+// ✅ Catch invalid routes
 app.use((req, res) => {
-  console.log("Route not found:", req.originalUrl);
+  console.log("❌ Route not found:", req.originalUrl);
   res.status(404).json({ message: "Route not found" });
 });
 
-// ✅ MongoDB connection
+// ✅ MongoDB Connection + Server Start
 const PORT = process.env.PORT || 5000;
+
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
-  .catch((e) => console.error("MongoDB connection error:", e.message));
+  .then(() => {
+    console.log("✅ MongoDB connected successfully");
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1);
+  });
+
+// ✅ Graceful shutdown for Render
+process.on("SIGTERM", () => {
+  console.log("🛑 SIGTERM received. Closing server...");
+  process.exit(0);
+});
