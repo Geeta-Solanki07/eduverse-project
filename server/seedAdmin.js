@@ -1,18 +1,27 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
 import User from "./models/User.js";
 
 dotenv.config();
-(async ()=>{
-  await mongoose.connect(process.env.MONGO_URI);
-  const email = "admin@company.com";
-  const exist = await User.findOne({ email });
-  if (exist) {
-    console.log("Admin exists");
+const MONGO = process.env.MONGO_URI;
+
+if (!MONGO) {
+  console.error("Set MONGO_URI in .env");
+  process.exit(1);
+}
+
+const createAdmin = async () => {
+  await mongoose.connect(MONGO);
+  const existing = await User.findOne({ email: "admin@eduverse.com" });
+  if (existing) {
+    console.log("Admin exists:", existing.email);
     process.exit(0);
   }
-  const admin = new User({ name: "Company Admin", email, password: "Admin@123", role: "admin" });
-  await admin.save();
-  console.log("Admin created:", email, "password: Admin@123");
+  const hashed = await bcrypt.hash("Admin@123", 10);
+  const admin = await User.create({ name: "Super Admin", email: "admin@eduverse.com", password: hashed, role: "admin" });
+  console.log("Created admin:", admin.email);
   process.exit(0);
-})();
+};
+
+createAdmin().catch(err => { console.error(err); process.exit(1); });

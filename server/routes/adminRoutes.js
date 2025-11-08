@@ -1,18 +1,27 @@
 import express from "express";
 import User from "../models/User.js";
-import Course from "../models/Course.js";
-import { verifyAdmin } from "../middleware/authMiddleware.js";
-
+import { protect, admin } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
-router.get("/stats", verifyAdmin, async (req, res) => {
+// Get all users (admin only)
+router.get("/users", protect, admin, async (req, res) => {
   try {
-    const users = await User.countDocuments();
-    const courses = await Course.countDocuments();
-    const revenue = courses * 2500; // Example calculation
-    res.json({ users, courses, revenue });
-  } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    const users = await User.find().select("-password");
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Delete user by admin
+router.delete("/users/:id", protect, admin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    await user.remove();
+    res.json({ message: "User removed successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 

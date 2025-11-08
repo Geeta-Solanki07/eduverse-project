@@ -1,52 +1,58 @@
 import Course from "../models/Course.js";
 
-// ➕ Add new course (Admin only)
-export const addCourse = async (req, res) => {
-  try {
-    const newCourse = new Course(req.body);
-    await newCourse.save();
-    res.status(201).json({ message: "Course added successfully", course: newCourse });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+
+export const createCourse = async (req, res) => {
+try {
+const payload = { ...req.body, createdBy: req.user.id };
+const course = await Course.create(payload);
+res.status(201).json(course);
+} catch (err) {
+console.error(err);
+res.status(500).json({ message: 'Server error' });
+}
 };
 
-// 📜 Get all courses (Public)
-export const getCourses = async (req, res) => {
-  try {
-    const courses = await Course.find().sort({ createdAt: -1 });
-    res.json(courses);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+
+export const listCourses = async (req, res) => {
+try {
+const courses = await Course.find().sort({ createdAt: -1 });
+res.json(courses);
+} catch (err) {
+console.error(err);
+res.status(500).json({ message: 'Server error' });
+}
 };
 
-// 🔍 Get single course (Public)
-export const getCourseById = async (req, res) => {
-  try {
-    const course = await Course.findById(req.params.id);
-    res.json(course);
-  } catch (err) {
-    res.status(404).json({ message: "Course not found" });
-  }
+
+export const getCourse = async (req, res) => {
+try {
+const course = await Course.findById(req.params.id);
+if(!course) return res.status(404).json({ message: 'Not found' });
+res.json(course);
+} catch (err) {
+console.error(err);
+res.status(500).json({ message: 'Server error' });
+}
 };
 
-// 🗑️ Delete course (Admin only)
-export const deleteCourse = async (req, res) => {
-  try {
-    await Course.findByIdAndDelete(req.params.id);
-    res.json({ message: "Course deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
 
-// ✏️ Update course (Admin only)
 export const updateCourse = async (req, res) => {
-  try {
-    const updated = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json({ message: "Course updated successfully", course: updated });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+try {
+const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
+res.json(course);
+} catch (err) {
+console.error(err);
+res.status(500).json({ message: 'Server error' });
+}
+};
+
+
+export const deleteCourse = async (req, res) => {
+try {
+await Course.findByIdAndDelete(req.params.id);
+res.json({ message: 'Deleted' });
+} catch (err) {
+console.error(err);
+res.status(500).json({ message: 'Server error' });
+}
 };

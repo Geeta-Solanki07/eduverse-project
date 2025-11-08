@@ -14,15 +14,22 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
-  withCredentials: true,
+  baseURL:
+    process.env.NODE_ENV === "production"
+      ? "https://eduverse-backend.onrender.com/api"
+      : "http://localhost:5000/api",
 });
 
+
+// attach token
 API.interceptors.request.use((config) => {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 
 export default API;
+
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { h4 } from "framer-motion/client";
 
 export default function HeroSection() {
   const [menuOpen, setMenuOpen] = useState(false);

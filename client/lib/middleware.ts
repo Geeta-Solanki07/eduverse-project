@@ -2,17 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token")?.value;
-  const url = req.nextUrl.clone();
+  const token = req.cookies.get("token") || req.headers.get("authorization");
 
-  if (req.nextUrl.pathname.startsWith("/admin")) {
-    // if no token -> redirect to login
-    if (!token) {
-      url.pathname = "/auth/login";
-      return NextResponse.redirect(url);
-    }
+  const path = req.nextUrl.pathname;
+  if (!token && (path.startsWith("/admin") || path.startsWith("/user"))) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
   return NextResponse.next();
 }
-
-export const config = { matcher: ["/admin/:path*"] };

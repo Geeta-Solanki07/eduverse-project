@@ -1,39 +1,36 @@
-"use client";
-import API from "@/lib/api";
 import { useEffect, useState } from "react";
+import API from "@/lib/api";
 
-export default function AdminUsers(){
-  const [users,setUsers] = useState<any[]>([]);
-  useEffect(()=>{ fetchUsers(); },[]);
-  const fetchUsers = async ()=> {
-    try {
-      const res = await API.get("/admin/users");
-      setUsers(res.data);
-    } catch (err) { console.error(err); }
-  };
-  const handleDelete = async (id:string)=>{
-    if(!confirm("Delete user?")) return;
-    await API.delete(`/admin/users/${id}`);
-    setUsers(prev=>prev.filter(u=>u._id!==id));
-  };
+export default function UsersPage() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    API.get("/users")
+      .then(res => setUsers(res.data))
+      .catch(err => console.error(err));
+  }, []);
+
   return (
-    <div>
-      <h2 className="text-2xl font-semibold mb-4">All Users</h2>
-      <div className="bg-white p-4 rounded shadow">
-        <table className="w-full">
-          <thead><tr className="border-b"><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead>
-          <tbody>
-            {users.map(u=>(
-              <tr key={u._id} className="border-b hover:bg-gray-50">
-                <td className="py-2">{u.name}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td><button onClick={()=>handleDelete(u._id)} className="text-red-600">Delete</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-4">Registered Users</h1>
+      <table className="w-full border">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Email</th>
+            <th className="p-2 border">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u:any) => (
+            <tr key={u._id}>
+              <td className="p-2 border">{u.name}</td>
+              <td className="p-2 border">{u.email}</td>
+              <td className="p-2 border">{u.role}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

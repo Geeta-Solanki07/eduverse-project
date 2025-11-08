@@ -1,79 +1,33 @@
 import express from "express";
-import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
-import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
 import authRoutes from "./routes/authRoutes.js";
-import courseRoutes from "./routes/courseRoutes.js";
+import usersRoutes from "./routes/usersRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 dotenv.config();
 const app = express();
 
-// ✅ Middleware
+// Middleware
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json());
-app.use(cookieParser());
 
-// ✅ Allowed origins (for local + deployed frontend)
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://eduverse-project.vercel.app",
-];
-
-// ✅ CORS setup
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
-
-// ✅ Preflight requests (important for Render)
-app.options("*", cors());
-
-// ✅ Routes
+// Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/courses", courseRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/contact", contactRoutes);
 
-// ✅ Root route
-app.get("/", (req, res) => {
-  res.send("Eduverse API running 🚀");
-});
+app.get("/", (req, res) => res.send("Server running ✅"));
 
-// ✅ Catch invalid routes
-app.use((req, res) => {
-  console.log("❌ Route not found:", req.originalUrl);
-  res.status(404).json({ message: "Route not found" });
-});
-
-// ✅ MongoDB Connection + Server Start
-const PORT = process.env.PORT || 5000;
-
+// Connect MongoDB
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("✅ MongoDB connected successfully");
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+    console.log("✅ MongoDB connected");
+    app.listen(process.env.PORT || 5000, () =>
+      console.log("🚀 Server running on port", process.env.PORT || 5000)
+    );
   })
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err.message);
-    process.exit(1);
-  });
-
-// ✅ Graceful shutdown for Render
-process.on("SIGTERM", () => {
-  console.log("🛑 SIGTERM received. Closing server...");
-  process.exit(0);
-});
+  .catch((err) => console.log("❌ DB Connection Failed:", err.message));

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import api from "@/lib/api"; // ✅ axios instance with baseURL + token setup
+import api from "@/lib/api"; // axios instance with baseURL + token setup
 
 interface LoginForm {
   email: string;
@@ -30,19 +30,24 @@ export default function LoginPage() {
     try {
       const res = await api.post("/auth/login", form);
 
-      if (res.data.success) {
-        // Save token
+      if (res.data?.token) {
+        // ✅ Save JWT token & user role
         localStorage.setItem("token", res.data.token);
-
-        // Optional: Save role for route guard
-        localStorage.setItem("role", res.data.user?.role);
+        localStorage.setItem("role", res.data.user?.role || "user");
 
         setSuccess("✅ Login successful!");
         setTimeout(() => {
-          router.push(res.data.user?.role === "admin" ? "/admin" : "/dashboard");
+          const role = res.data.user?.role;
+          if (role === "admin") {
+            router.push("/admin"); // Admin Dashboard
+          } else if (role === "teacher") {
+            router.push("/teacher"); // Teacher Dashboard
+          } else {
+            router.push("/dashboard"); // Student/User Dashboard
+          }
         }, 1000);
       } else {
-        setError(res.data.message || "Invalid credentials");
+        setError(res.data.message || "Invalid credentials. Try again.");
       }
     } catch (err: any) {
       setError(err?.response?.data?.msg || "Server error. Please try again.");
@@ -148,37 +153,9 @@ export default function LoginPage() {
             {loading ? "Signing In..." : "Sign In"}
           </button>
 
-          {/* Social Logins */}
-          <div className="flex items-center my-6">
-            <hr className="flex-1 border-gray-300" />
-            <span className="mx-2 text-gray-400 text-sm">or continue with</span>
-            <hr className="flex-1 border-gray-300" />
-          </div>
-
-          <div className="flex justify-center gap-3">
-            <button
-              type="button"
-              className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
-            >
-              <i className="fab fa-google text-red-500"></i>
-            </button>
-            <button
-              type="button"
-              className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
-            >
-              <i className="fab fa-facebook text-blue-600"></i>
-            </button>
-            <button
-              type="button"
-              className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
-            >
-              <i className="fab fa-github text-gray-800"></i>
-            </button>
-          </div>
-
           {/* Register Link */}
           <p className="text-center text-gray-500 text-sm mt-6">
-            Do not have an account?{" "}
+            Don not have an account?{" "}
             <a href="/auth/register" className="text-indigo-600 font-medium">
               Sign up
             </a>
