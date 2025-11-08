@@ -16,12 +16,11 @@ import axios from "axios";
 const API = axios.create({
   baseURL:
     process.env.NODE_ENV === "production"
-      ? "https://eduverse-backend.onrender.com/api"
-      : "http://localhost:5000/api",
+      ? "https://eduverse-project.vercel.app/" // ✅ Production backend
+      : "http://localhost:5000/api",               // ✅ Local backend for dev
 });
 
-
-// attach token
+// Attach JWT token if exists
 API.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
@@ -31,5 +30,4 @@ API.interceptors.request.use((config) => {
 });
 
 export default API;
-
 
