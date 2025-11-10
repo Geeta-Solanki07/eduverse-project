@@ -16,7 +16,7 @@ import axios from "axios";
 const API = axios.create({
   baseURL:
     process.env.NODE_ENV === "production"
-      ? "https://eduverse-project.onrender.com" // ✅ Production backend
+      ? "https://eduverse-project.onrender.com/api" // ✅ Production backend
       : "http://localhost:5000/api",               // ✅ Local backend for dev
 });
 
