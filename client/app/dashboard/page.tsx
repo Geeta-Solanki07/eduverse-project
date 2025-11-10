@@ -1,31 +1,25 @@
 "use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import DashboardNavbar from "@/components/admin/DashboardNavbar";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function StudentDashboard() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    if (!token || role !== "user") {
-      router.push("/auth/login");
-    }
-  }, [router]);
-
   return (
-    <div className="min-h-screen bg-blue-50">
-      <DashboardNavbar title="Student Dashboard" />
-      <div className="flex flex-col items-center justify-center py-20">
-        <h1 className="text-3xl font-semibold text-gray-800 mb-3">
-          Welcome Student 🎓
-        </h1>
-        <p className="text-gray-600">
-          You can browse courses, view progress, and continue learning!
-        </p>
+    <ProtectedRoute allowedRoles={["student", "teacher", "admin"]}>
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white p-8">
+        <h1 className="text-3xl font-bold text-indigo-700 mb-4">Welcome to EduVerse</h1>
+        <p className="text-gray-600 mb-6">Access your courses, progress, and announcements here.</p>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-2">My Courses</h2>
+            <p className="text-gray-500 text-sm">View enrolled courses and progress.</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-2">Announcements</h2>
+            <p className="text-gray-500 text-sm">Latest updates from teachers and admins.</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
