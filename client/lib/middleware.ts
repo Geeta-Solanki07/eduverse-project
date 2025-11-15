@@ -1,12 +1,27 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
-  const token = req.cookies.get("token") || req.headers.get("authorization");
+export function middleware(req: any) {
+  const token = req.cookies.get("token")?.value || null;
 
-  const path = req.nextUrl.pathname;
-  if (!token && (path.startsWith("/admin") || path.startsWith("/user"))) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  // Public paths → no protection
+  const publicPaths = ["/auth/login", "/auth/register"];
+  if (publicPaths.includes(req.nextUrl.pathname)) {
+    return NextResponse.next();
   }
+
+  // If no token → redirect to login
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
+
   return NextResponse.next();
 }
+
+// Protect all admin, teacher and user dashboards
+export const config = {
+  matcher: [
+    "/admin/:path*",
+    "/teacher/:path*",
+    "/dashboard/:path*",
+  ],
+};

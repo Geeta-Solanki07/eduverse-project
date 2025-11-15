@@ -6,7 +6,7 @@ const features = [
   {
     id: 1,
     title: "Professional Courses",
-    desc: "Learn Artificial Intelligence, Machine Learning, Web Development, Python, Flutter, React Native, MERN stack and more.",
+    desc: "Learn AI, ML, Web Development, Python, Flutter, React Native, MERN stack and much more with industry experts.",
     img: "/assets/it/proffesional.png",
     bg: "bg-[#D9FFE6]",
   },
@@ -20,52 +20,77 @@ const features = [
   {
     id: 3,
     title: "Online Certificates",
-    desc: "Get industry-recognized certificates on course completion to boost your resume and career opportunities.",
+    desc: "Industry-recognized certificates to boost your resume and career opportunities.",
     img: "/assets/it/certificate.png",
     bg: "bg-[#B8D7FF]",
   },
 ];
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * FeaturesSection is a component that displays the features of the IT profession courses,
- * including professional courses, top instructors, and online certificates.
- * It is a section component with a heading, a features grid, and a background color of gray.
- * The features grid is a flex container that wraps around to form a grid of feature cards.
- * Each feature card contains a title, description, and an image.
- * The feature cards are styled with a background color, border radius, and a shadow effect.
- * The component also includes a hover effect that scales the feature cards up when hovered over.
- * The component is exported as the default export of the module.
- */
-/*******  71b3bcf2-953f-46b6-82c2-9087627ae5c5  *******/export default function FeaturesSection() {
+export default function FeaturesAndCTA() {
   return (
-    <section className="w-full px-5 md:px-20 py-20 text-center bg-gray-50">
-      {/* Section Heading */}
-      <h2 className="text-[#F37021] text-3xl font-light mb-2">FEATURES</h2>
-      <h3 className="text-black text-3xl md:text-4xl font-semibold mb-16 leading-snug">
-        Emerging Technologies and Trends in <br /> Software Development
-      </h3>
+    <section className="w-full bg-gradient-to-b from-orange-50 to-white py-20 px-5 md:px-20">
 
-      {/* Features Grid */}
-      <div className="flex flex-wrap justify-center gap-12">
-        {features.map((feature) => (
+      {/* ==== TOP HEADING ==== */}
+      <div className="text-center mb-16">
+        <h2 className="text-[#F37021] text-3xl font-light mb-2">FEATURES</h2>
+        <h3 className="text-black text-3xl md:text-4xl font-semibold leading-snug">
+          Emerging Technologies and Trends in <br /> Software Development
+        </h3>
+      </div>
+
+      {/* ==== FEATURES GRID ==== */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto mb-20">
+        {features.map((f) => (
           <div
-            key={feature.id}
-            className={`flex flex-col items-center justify-between w-full md:w-[380px] h-[450px] p-8 rounded-3xl shadow-xl ${feature.bg} hover:scale-105 transition-transform duration-500`}
+            key={f.id}
+            className={`rounded-3xl shadow-xl p-10 text-center ${f.bg} 
+            hover:-translate-y-3 hover:shadow-2xl transition-all duration-500`}
           >
-            <div className="w-48 h-48 relative mb-6">
+            <div className="w-56 h-56 mx-auto relative mb-8">
               <Image
-                src={feature.img}
-                alt={feature.title}
+                src={f.img}
+                alt={f.title}
                 fill
-                className="object-contain"
+                className="object-contain scale-110"
               />
             </div>
-            <h4 className="text-black text-2xl font-semibold mb-4">{feature.title}</h4>
-            <p className="text-black/70 text-base font-sans leading-7">{feature.desc}</p>
+
+            <h4 className="text-2xl font-bold text-gray-900 mb-3">
+              {f.title}
+            </h4>
+
+            <p className="text-gray-700 leading-relaxed text-lg">
+              {f.desc}
+            </p>
           </div>
         ))}
       </div>
+
+      {/* ==== CTA MERGED BELOW ==== */}
+      <div className="bg-gradient-to-r from-red-600 to-blue-600 text-white py-14 px-8 rounded-3xl 
+      shadow-xl max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+
+        {/* EMAIL */}
+        <div className="text-center md:text-left">
+          <h3 className="text-2xl md:text-3xl font-semibold mb-1">Get in Touch :</h3>
+          <p className="text-2xl font-bold hover:text-orange-200 transition">
+            info@dousoft.com
+          </p>
+        </div>
+
+        {/* DIVIDER */}
+        <span className="text-orange-200 font-bold text-4xl hidden md:block">|</span>
+        <span className="text-orange-200 font-bold text-3xl md:hidden">OR</span>
+
+        {/* CALL */}
+        <div className="text-center md:text-left">
+          <h3 className="text-2xl md:text-3xl font-semibold mb-1">Call Us Via :</h3>
+          <p className="text-2xl font-bold hover:text-orange-200 transition">
+            +01 523 456 789
+          </p>
+        </div>
+      </div>
+
     </section>
   );
 }

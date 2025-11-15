@@ -1,19 +1,36 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles: string[] }) {
+interface Props {
+  children: ReactNode;
+  allowedRoles?: string[];
+}
+
+export default function ProtectedRoute({ children, allowedRoles = ["student", "teacher", "admin"] }: Props) {
   const router = useRouter();
-  const [isAuth, setIsAuth] = useState(false);
+  const [ok, setOk] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    if (!token) router.push("/auth/login");
-    else if (!allowedRoles.includes(role || "")) router.push("/");
-    else setIsAuth(true);
+    if (!token) {
+      router.push("/auth/login");
+      return;
+    }
+    if (!allowedRoles.includes(role || "")) {
+      router.push("/");
+      return;
+    }
+    setOk(true);
   }, [router, allowedRoles]);
 
-  if (!isAuth) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (!ok)
+    return (
+      <div className="h-screen flex items-center justify-center text-gray-500">
+        Loading...
+      </div>
+    );
+
   return <>{children}</>;
 }

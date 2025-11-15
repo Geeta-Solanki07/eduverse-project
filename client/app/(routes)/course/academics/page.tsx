@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import Navbar from "@/components/course/Academics/Navbar";
+import Navbar from "@/components/academics/Navbar";
 import HeroSection from "@/components/course/Academics/HeroSection";
 import Category from "@/components/course/Academics/Category";
 import Card from "@/components/course/Academics/Card";
 import Pagination from "@/components/course/Academics/Pagination";
 import Footer from "@/components/academics/Footer";
+import { div } from "framer-motion/client";
 
 export interface Material {
   id: number;

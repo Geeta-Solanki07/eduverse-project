@@ -1,65 +1,79 @@
 import User from "../models/User.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const register = async (req, res) => {
+const genToken = (user) => {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+};
+
+// REGISTER
+export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+
     if (!name || !email || !password)
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "Missing fields" });
 
-    const existing = await User.findOne({ email });
-    if (existing)
-      return res.status(400).json({ message: "User already exists" });
+    // Block admin registration
+    if (role === "admin")
+      return res.status(403).json({ success: false, message: "Admin creation not allowed" });
 
-    const user = await User.create({ name, email, password });
+    const exists = await User.findOne({ email });
+    if (exists)
+      return res.status(400).json({ success: false, message: "Email already registered" });
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
-      token,
+    await User.create({
+      name,
+      email,
+      password,
+      role,
+      avatar: "",
+      phone: "",
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+
+    return res
+      .status(201)
+      .json({ success: true, message: "Account created successfully" });
+  } catch (e) {
+    return res.status(500).json({ success: false, message: e.message });
   }
 };
 
-export const login = async (req, res) => {
+// LOGIN
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ message: "All fields are required" });
 
     const user = await User.findOne({ email });
     if (!user)
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match)
-      return res.status(400).json({ message: "Invalid credentials" });
+    const ok = await user.matchPassword(password);
+    if (!ok)
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = genToken(user);
 
-    res.json({
+    // JWT COOKIE FIXED
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
       success: true,
-      message: "Login successful",
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };

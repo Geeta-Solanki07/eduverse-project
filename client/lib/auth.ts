@@ -1,37 +1,38 @@
+"use client";
+
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
-// lib/auth.ts
-export function parseJwt(token: string | null) {
+export function getTokenPayload() {
+  if (typeof window === "undefined") return null;
+
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
   try {
-    if (!token) return null;
-    const base64 = token.split(".")[1];
-    const jsonPayload = decodeURIComponent(
-      atob(base64).split("").map((c) =>
-        "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
-      ).join("")
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
     return null;
   }
 }
 
-export function isTokenExpired(token: string | null) {
-  const payload = parseJwt(token);
-  if (!payload || !payload.exp) return true;
-  // payload.exp is in seconds
-  return Date.now() >= payload.exp * 1000;
-}
+export function requireAuthCheck(
+  router: AppRouterInstance,
+  allowedRoles: string[] = ["user"]
+) {
+  if (typeof window === "undefined") return false;
 
-export function requireAuthCheck(router: AppRouterInstance | string[]) {
-  // call this in components/pages to guard client-side
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  if (!token || isTokenExpired(token)) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    router.push("/login");
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
+  if (!token || !role) {
+    router.push("/auth/login");
     return false;
   }
+
+  if (!allowedRoles.includes(role)) {
+    router.push("/auth/login");
+    return false;
+  }
+
   return true;
 }

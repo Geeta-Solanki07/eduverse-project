@@ -1,277 +1,151 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { Menu, X, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
-const HeroSection = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
+export default function HeroSection() {
   return (
-    <header className="relative bg-green-50 overflow-hidden p-5">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center px-4 md:px-10 h-20 relative z-20">
-        {/* Logo */}
-        <Link href="/">
-          <Image
-            src="/logo.png"
-            alt="Dousoft Eduverse Logo"
-            width={120}
-            height={40}
-            className="object-contain"
-          />
-        </Link>
+    <header className="relative bg-green-50 overflow-hidden pt-20 pb-28 px-6 md:px-10">
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-gray-800 text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          {menuOpen ? <X /> : <Menu />}
-        </button>
-
-        {/* Navigation Links */}
-        <div
-          className={`${
-            menuOpen
-              ? "flex flex-col absolute top-20 left-0 w-full bg-white shadow-md p-4 space-y-4"
-              : "hidden"
-          } md:flex md:space-x-6 md:static md:flex-row md:bg-transparent md:shadow-none items-center`}
-        >
-          {/* Courses Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setDropdownOpen(true)}
-            onMouseLeave={() => setDropdownOpen(false)}
-          >
-            <button className="flex items-center gap-2 text-gray-800 hover:text-orange-500">
-              <Image
-                src="/assets/it/emojione-monotone_books.svg"
-                alt="Books"
-                width={20}
-                height={20}
-              />
-              <span>Courses</span>
-              <Image
-                src="/assets/it/Polygon 1.svg"
-                alt="Arrow"
-                width={10}
-                height={10}
-              />
-            </button>
-
-            {/* Mega Menu */}
-            {dropdownOpen && (
-              <div className="absolute left-0 top-full mt-3 w-[90vw] md:w-[900px] bg-white shadow-lg rounded-xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6 z-50">
-                {/* Elementary */}
-                <div>
-                  <h4 className="text-orange-500 border-b-2 border-orange-500 mb-3 pb-1 font-semibold">
-                    Elementary (1st-5th)
-                  </h4>
-                  <ul className="space-y-2 text-gray-700">
-                    {["1st", "2nd", "3rd", "4th", "5th"].map((num) => (
-                      <li key={num}>
-                        <Link href={`/${num.toLowerCase()}-class`}>
-                          {num} Class
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Junior */}
-                <div>
-                  <h4 className="text-orange-500 border-b-2 border-orange-500 mb-3 pb-1 font-semibold">
-                    Junior (6th-8th)
-                  </h4>
-                  <ul className="space-y-2 text-gray-700">
-                    {["6th", "7th", "8th"].map((num) => (
-                      <>
-                        <li key={`${num}-eng`}>
-                          <Link href={`/${num}-class-english`}>
-                            {num} Class - English
-                          </Link>
-                        </li>
-                        <li key={`${num}-hin`}>
-                          <Link href={`/${num}-class-hindi`}>
-                            {num} Class - Hindi
-                          </Link>
-                        </li>
-                      </>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Senior */}
-                <div>
-                  <h4 className="text-orange-500 border-b-2 border-orange-500 mb-3 pb-1 font-semibold">
-                    Senior (9th-12th)
-                  </h4>
-                  <ul className="space-y-2 text-gray-700">
-                    {["9th", "10th", "11th", "12th"].map((num) => (
-                      <li key={num}>
-                        <Link href={`/${num}-class`}>{num} Class</Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <Link
-            href="/course/academics"
-            className="text-gray-800 hover:text-orange-500 md:bg-orange-100 md:rounded-lg md:px-3 md:py-1"
-          >
-            Study Materials
-          </Link>
-          <Link href="/support" className="hover:text-orange-500 text-gray-800">
-            Support
-          </Link>
-
-          {/* Mobile Search */}
-          <div className="flex items-center bg-gray-100 rounded-full px-3 py-2 md:hidden">
-            <Search className="text-gray-500" size={20} />
-            <input
-              type="text"
-              placeholder="Search here..."
-              className="bg-transparent border-none outline-none text-gray-700 ml-2 w-full"
-            />
-          </div>
-
-          {/* Mobile Login/Register */}
-          <Link
-            href="/auth/register"
-            className="bg-orange-500 text-white py-2 px-4 rounded-lg text-center md:hidden"
-            onClick={() => setMenuOpen(false)}
-          >
-            Register
-          </Link>
-          <Link
-            href="/auth/login"
-            className="border border-orange-500 text-orange-500 py-2 px-4 rounded-lg text-center md:hidden"
-            onClick={() => setMenuOpen(false)}
-          >
-            Login
-          </Link>
-        </div>
-
-        {/* Desktop Right Section */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center bg-gray-100 rounded-full px-3 py-2 w-72">
-            <Search className="text-gray-500" size={20} />
-            <input
-              type="text"
-              placeholder="Search here..."
-              className="bg-transparent border-none outline-none text-gray-700 ml-2 w-full"
-            />
-          </div>
-          <Link
-            href="/auth/register"
-            className="bg-orange-500 text-white px-5 py-2 rounded-lg hover:bg-orange-600 transition"
-          >
-            Register
-          </Link>
-          <Link
-            href="/auth/login"
-            className="border border-orange-500 text-orange-500 px-5 py-2 rounded-lg hover:bg-orange-50 transition"
-          >
-            Login
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Content */}
-      <div className="text-center px-4 py-12 relative z-10">
-        <h1 className="text-3xl md:text-5xl font-semibold text-gray-800 mb-4">
+      {/* Content */}
+      <div className="relative z-10 text-center max-w-3xl mx-auto">
+        <h1 className="text-4xl md:text-6xl font-bold text-gray-800 leading-tight mb-4">
           A Brighter Future For Kids
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+
+        <p className="text-gray-600 text-lg md:text-xl mb-10">
           Let your child start learning how to excel in School Curriculum, Maths & English!
         </p>
 
-        <div className="max-w-md mx-auto flex items-center justify-between bg-white shadow-lg rounded-full px-5 py-3 mb-8">
-          <span className="text-sm text-gray-500 truncate">
+        {/* Search Bar */}
+        <div className="max-w-lg mx-auto bg-white rounded-full shadow-xl px-6 py-4 flex items-center justify-between hover:shadow-2xl transition">
+          <span className="text-gray-500 text-sm md:text-base truncate">
             Search By Course Name, Just Type To Get Hint...
           </span>
-          <Search className="text-gray-500" />
+          <Search className="text-gray-500 w-5 h-5" />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-8 mb-10">
+        {/* Stats */}
+        <div className="flex justify-center flex-wrap gap-12 mt-14">
           {/* Classes */}
-          <div className="flex items-center gap-4">
-            <div className="bg-white p-4 rounded-full shadow-md w-16 h-16 flex items-center justify-center">
+          <div className="flex items-center gap-4 group">
+            <div className="bg-white p-5 rounded-full shadow-md w-20 h-20 flex items-center justify-center group-hover:shadow-lg transition">
               <Image
                 src="/assets/it/Vector.svg"
                 alt="Classes Icon"
-                width={50}
-                height={50}
+                width={55}
+                height={55}
               />
             </div>
-            <div className="text-lg font-light text-gray-700">
+            <div className="text-gray-700 text-lg md:text-xl font-medium leading-tight">
               Classes <br /> 1st to 12th
             </div>
           </div>
 
           {/* Instructors */}
-          <div className="flex items-center gap-4">
-            <div className="bg-white p-4 rounded-full shadow-md w-16 h-16 flex items-center justify-center">
+          <div className="flex items-center gap-4 group">
+            <div className="bg-white p-5 rounded-full shadow-md w-20 h-20 flex items-center justify-center group-hover:shadow-lg transition">
               <Image
                 src="/assets/it/Vector (1).svg"
                 alt="Instructors Icon"
-                width={50}
-                height={50}
+                width={55}
+                height={55}
               />
             </div>
-            <div className="text-lg font-light text-gray-700">
+            <div className="text-gray-700 text-lg md:text-xl font-medium leading-tight">
               200+ Top <br /> Instructors
             </div>
           </div>
         </div>
       </div>
 
-      {/* Background Images */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {/* Background Graphics */}
+      <div className="absolute inset-0 pointer-events-none">
+        
+        {/* Left Girl */}
         <Image
           src="/assets/ac/girl.png"
           alt="Girl"
-          width={200}
-          height={200}
-          className="absolute left-[5%] top-[35%] w-40 md:w-56 hidden md:block"
+          width={260}
+          height={260}
+          className="absolute left-[4%] top-[38%] w-40 md:w-60 hidden md:block animate-float"
         />
+
+        {/* Right Boy */}
         <Image
           src="/assets/ac/boy.png"
           alt="Boy"
-          width={250}
-          height={250}
-          className="absolute right-[5%] top-[30%] w-52 md:w-64 hidden md:block"
+          width={300}
+          height={300}
+          className="absolute right-[4%] top-[32%] w-48 md:w-72 hidden md:block animate-float-delayed"
         />
+
+        {/* Decorative Background Icons */}
         <Image
           src="/assets/ac/book.png"
           alt="Book"
-          width={100}
-          height={100}
-          className="absolute left-[3%] top-[30%] opacity-10 md:opacity-100"
+          width={120}
+          height={120}
+          className="absolute left-[2%] top-[30%] opacity-10 md:opacity-100 animate-bounce-slow"
         />
+
         <Image
           src="/assets/ac/callendar.png"
           alt="Calendar"
-          width={60}
-          height={60}
-          className="absolute right-[3%] top-[20%] opacity-10 md:opacity-100"
+          width={80}
+          height={80}
+          className="absolute right-[3%] top-[18%] opacity-10 md:opacity-100 animate-spin-slow"
         />
+
+        {/* Bottom Shape */}
         <Image
           src="/assets/ac/abt-shape.png"
           alt="Shape"
-          width={1000}
-          height={400}
+          width={1500}
+          height={500}
           className="absolute bottom-0 left-0 w-full"
         />
       </div>
+
+      {/* Animations */}
+      <style jsx>{`
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float 4.5s ease-in-out infinite;
+        }
+        .animate-spin-slow {
+          animation: spin 12s linear infinite;
+        }
+        .animate-bounce-slow {
+          animation: bounce 5s ease-in-out infinite;
+        }
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-8px);
+          }
+        }
+      `}</style>
     </header>
   );
-};
-
-export default HeroSection;
+}

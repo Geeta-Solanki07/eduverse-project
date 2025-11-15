@@ -1,28 +1,23 @@
 import express from "express";
-import User from "../models/User.js";
-import { protect, admin } from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { adminOnly } from "../middleware/roleMiddleware.js";
+import * as adminCtrl from "../controllers/adminController.js";
+import * as courseCtrl from "../controllers/courseController.js";
+
 const router = express.Router();
 
-// Get all users (admin only)
-router.get("/users", protect, admin, async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+router.get("/stats", protect, adminOnly, adminCtrl.stats);
 
-// Delete user by admin
-router.delete("/users/:id", protect, admin, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    await user.remove();
-    res.json({ message: "User removed successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
+// users
+router.get("/users", protect, adminOnly, adminCtrl.getUsers);
+router.post("/users", protect, adminOnly, adminCtrl.addUser);
+router.put("/users/:id", protect, adminOnly, adminCtrl.updateUser);
+router.delete("/users/:id", protect, adminOnly, adminCtrl.deleteUser);
+
+// courses
+router.get("/courses", protect, adminOnly, courseCtrl.getCourses);
+router.post("/courses", protect, adminOnly, courseCtrl.addCourse);
+router.put("/courses/:id", protect, adminOnly, courseCtrl.updateCourse);
+router.delete("/courses/:id", protect, adminOnly, courseCtrl.deleteCourse);
 
 export default router;

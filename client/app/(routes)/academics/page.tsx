@@ -1,3 +1,4 @@
+import Navbar from "@/components/academics/Navbar";
 import HeroSection from "@/components/academics/HeroSection";
 import AboutSection from "@/components/academics/AboutSection";
 import FeaturesSection from "@/components/academics/FeaturesSection";
@@ -134,6 +135,7 @@ const courses = [
 export default function AcademicsPage() {
   return (
     <div className="bg-white font-poppins text-gray-800">
+      <Navbar/>
       <HeroSection />
       <AboutSection />
       <FeaturesSection />

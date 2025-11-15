@@ -1,6 +1,6 @@
 
 import React from "react";
-import Navbar from "@/components/course/IT/Navbar";
+import Navbar from "@/components/it-professions/Navbar";
 import Support from "@/components/support/Support"; 
 import Footer from "@/components/it-professions/Footer";
 

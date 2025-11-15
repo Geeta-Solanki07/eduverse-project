@@ -1,31 +1,65 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import api from "@/lib/api"; // axios instance
+
+interface Feature {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  bg: string;
+}
 
 export default function FeaturesSection() {
-  const features = [
-    {
-      id: 1,
-      title: "Hands-On Projects",
-      description: "Focus on experiments, and real-life applications",
-      image: "/assets/ac/interactive.svg",
-      bg: "bg-[#D9FFE6]",
-    },
-    {
-      id: 2,
-      title: "Interactive Sessions",
-      description: "Play-based learning for deeper understanding of the concepts",
-      image: "/assets/ac/interactive.svg",
-      bg: "bg-[#FFE7D9]",
-    },
-    {
-      id: 3,
-      title: "Future Ready",
-      description: "Developing communication, empathy, and leadership skills",
-      image: "/assets/ac/future-ready.svg",
-      bg: "bg-[#B8D7FF]",
-    },
-  ];
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchFeatures() {
+      try {
+        const res = await api.get("/features"); // backend route
+        setFeatures(res.data.features);
+      } catch (error) {
+        console.error("Failed to load features:", error);
+
+        // fallback static data (optional)
+        setFeatures([
+          {
+            id: 1,
+            title: "Hands-On Projects",
+            description: "Focus on experiments, and real-life applications",
+            image: "/assets/ac/interactive.svg",
+            bg: "bg-[#D9FFE6]",
+          },
+          {
+            id: 2,
+            title: "Interactive Sessions",
+            description: "Play-based learning for deeper understanding of concepts",
+            image: "/assets/ac/interactive.svg",
+            bg: "bg-[#FFE7D9]",
+          },
+          {
+            id: 3,
+            title: "Future Ready",
+            description: "Developing communication, empathy, and leadership skills",
+            image: "/assets/ac/future-ready.svg",
+            bg: "bg-[#B8D7FF]",
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFeatures();
+  }, []);
+
+  if (loading)
+    return (
+      <div className="py-20 text-center text-gray-500">Loading features...</div>
+    );
 
   return (
     <section className="w-full py-16 px-6 md:px-12 text-center bg-white">
@@ -43,7 +77,9 @@ export default function FeaturesSection() {
         {features.map((feature) => (
           <div
             key={feature.id}
-            className={`${feature.bg} w-full sm:w-[300px] md:w-[360px] lg:w-[384px] h-auto rounded-2xl shadow-lg p-8 flex flex-col items-center justify-between hover:scale-105 transition-transform duration-300`}
+            className={`${feature.bg} w-full sm:w-[300px] md:w-[360px] lg:w-[384px] 
+            rounded-2xl shadow-lg p-8 flex flex-col items-center justify-between
+            hover:scale-105 transition-transform duration-300`}
           >
             <div>
               <h4 className="text-black text-xl md:text-2xl font-semibold mb-4">

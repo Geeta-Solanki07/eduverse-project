@@ -11,23 +11,18 @@
 // export default api;
 
 
+// lib/api.ts
 import axios from "axios";
 
-const API = axios.create({
+const api = axios.create({
   baseURL:
     process.env.NODE_ENV === "production"
-      ? "https://eduverse-project.onrender.com/api" // ✅ Production backend
-      : "http://localhost:5000/api",               // ✅ Local backend for dev
+      ? "https://eduverse-project.onrender.com/api"
+      : "http://localhost:5000/api",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-// Attach JWT token if exists
-API.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("token");
-    if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-export default API;
-
+export default api;

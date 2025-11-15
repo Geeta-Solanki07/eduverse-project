@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardNavbar from "@/components/admin/DashboardNavbar";
+import DashboardNavbar from "@/components/admin/Navbar";
 import DashboardCard from "@/components/admin/DashboardCard";
 import CourseForm from "@/components/admin/CourseForm";
 
@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardNavbar title="Admin Dashboard" />
+      <DashboardNavbar  />
 
       <main className="p-8">
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">

@@ -1,56 +1,47 @@
 import express from "express";
-import Course from "../models/Course.js";
-import jwt from "jsonwebtoken";
+import { Course } from "../models/Course.js";
 
 const router = express.Router();
 
-// Middleware: Verify Admin
-const verifyAdmin = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token" });
+// Get all IT Courses
+router.get("/it", async (req, res) => {
+  try {
+    const courses = await Course.find({ level: "IT" });
+    res.json(courses);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(403).json({ message: "Invalid token" });
-    if (decoded.role !== "admin") return res.status(403).json({ message: "Access denied" });
-    req.user = decoded;
-    next();
-  });
-};
+// Get all Academic Courses
+router.get("/academics", async (req, res) => {
+  try {
+    const courses = await Course.find({ level: "Academics" });
+    res.json(courses);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// CREATE
-router.post("/", verifyAdmin, async (req, res) => {
+// Get Single Course by Slug
+router.get("/:slug", async (req, res) => {
+  try {
+    const course = await Course.findOne({ slug: req.params.slug });
+    if (!course) return res.status(404).json({ message: "Course not found" });
+    res.json(course);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add new course (Admin)
+router.post("/add", async (req, res) => {
   try {
     const newCourse = new Course(req.body);
     await newCourse.save();
-    res.status(201).json(newCourse);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-// READ
-router.get("/", async (req, res) => {
-  const courses = await Course.find();
-  res.json(courses);
-});
-
-// UPDATE
-router.put("/:id", verifyAdmin, async (req, res) => {
-  try {
-    const course = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(course);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-});
-
-// DELETE
-router.delete("/:id", verifyAdmin, async (req, res) => {
-  try {
-    await Course.findByIdAndDelete(req.params.id);
-    res.json({ message: "Course deleted" });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(201).json({ message: "✅ Course added successfully", newCourse });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

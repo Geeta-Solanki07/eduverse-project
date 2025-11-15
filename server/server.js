@@ -1,29 +1,28 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
-import courseRoutes from "./routes/courseRoutes.js";
-import contactRoutes from "./routes/contactRoutes.js";
 
 dotenv.config();
 const app = express();
-app.use(cors());
+
 app.use(express.json());
+app.use(cookieParser());
 
-// routes
-app.use("/api/auth", authRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/contact", contactRoutes);
-
-app.get("/", (req, res) => res.json({ msg: "Eduverse API running" }));
-
-const PORT = process.env.PORT || 5000;
-
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// CORS FIXED FOR YOUR NEXT.JS
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://eduverse-project.vercel.app"],
+    credentials: true,
   })
-  .catch((err) => console.error("Mongo connection err:", err));
+);
+
+app.use("/api/auth", authRoutes);
+
+// DB + SERVER
+mongoose.connect(process.env.MONGO_URI).then(() => {
+  console.log("✔ MongoDB Connected");
+  app.listen(5000, () => console.log("✔ Server running at 5000"));
+});

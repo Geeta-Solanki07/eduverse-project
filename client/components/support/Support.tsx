@@ -79,87 +79,69 @@ const supportOptions = [
 const SupportPage: React.FC = () => {
   const [faqActive, setFaqActive] = useState<number | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const data = {
-      name: (form.elements.namedItem("name") as HTMLInputElement).value,
-      email: (form.elements.namedItem("email") as HTMLInputElement).value,
-      subject: (form.elements.namedItem("subject") as HTMLSelectElement).value,
-      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
-    };
-
-    try {
-      const res = await fetch("http://localhost:5000/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      if (result.success) {
-        alert("✅ Message sent successfully!");
-        form.reset();
-      } else {
-        alert("⚠️ " + result.error);
-      }
-    } catch (err) {
-      alert("❌ Something went wrong. Please try again.");
-    }
-  };
-
   return (
     <div className="font-poppins bg-gray-50 min-h-screen text-black">
-      {/* Hero Section */}
-      <section className="relative text-center py-20 bg-[#c5d1ff] overflow-hidden">
+
+      {/* ======================
+          HERO SECTION (UPGRADED)
+      ======================= */}
+      <section className="relative text-center py-24 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-300 text-white shadow-lg overflow-hidden">
+
+        {/* Floating Icons */}
         <Image
           src="/assets/it/python.png"
           alt="Python Icon"
-          width={120}
-          height={120}
-          className="absolute top-10 left-8 animate-bounce hidden md:block"
+          width={130}
+          height={130}
+          className="absolute top-12 left-16 opacity-90 animate-bounce hidden md:block"
         />
         <Image
           src="/assets/it/html.png"
           alt="HTML Icon"
-          width={120}
-          height={120}
-          className="absolute bottom-10 right-8 animate-pulse hidden md:block"
+          width={130}
+          height={130}
+          className="absolute bottom-14 right-16 opacity-90 animate-pulse hidden md:block"
         />
-        <div className="max-w-3xl mx-auto px-6">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black">
+
+        <div className="max-w-3xl mx-auto px-6 relative z-10">
+          <h1 className="text-5xl font-extrabold mb-4 drop-shadow-lg">
             How Can We Help You?
           </h1>
-          <p className="text-lg text-black mb-8">
-            Find answers to your questions or contact our team. We&apos;re here to assist you.
+          <p className="text-lg text-orange-100 mb-8">
+            Search solutions, explore FAQs, or connect with our support team.
           </p>
-          <div className="flex items-center justify-center gap-2 max-w-md mx-auto">
+
+          {/* Search Bar */}
+          <div className="flex items-center justify-center gap-2 max-w-lg mx-auto bg-white/80 backdrop-blur-lg p-2 rounded-2xl shadow-md">
             <input
               type="text"
               placeholder="Describe your issue..."
-              className="w-full px-4 py-3 rounded-xl focus:outline-none text-gray-800"
+              className="w-full px-4 py-3 rounded-xl focus:outline-none text-gray-800 bg-white"
             />
-            <button className="px-6 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition">
+            <button className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-800 transition">
               Search
             </button>
           </div>
         </div>
       </section>
 
-      {/* Support Options */}
-      <section className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* ======================
+          SUPPORT OPTIONS (UPGRADED)
+      ======================= */}
+      <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         {supportOptions.map((item, idx) => (
           <div
             key={idx}
-            className="bg-white rounded-2xl shadow-md p-6 flex flex-col gap-4 items-start hover:shadow-xl transition"
+            className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl p-7 border border-orange-100 hover:shadow-2xl transition-transform hover:-translate-y-1 flex flex-col gap-4"
           >
-            <i className={`${item.icon} text-3xl text-orange-600`}></i>
-            <h3 className="text-xl font-semibold">{item.title}</h3>
+            <i className={`${item.icon} text-4xl text-orange-600`}></i>
+            <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
             <p className="text-gray-600 text-sm">{item.text}</p>
             <a
               href={item.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-orange-600 font-medium hover:underline flex items-center gap-1"
+              className="text-orange-600 font-medium hover:underline flex items-center gap-2"
             >
               Learn More <i className="fas fa-arrow-right"></i>
             </a>
@@ -167,24 +149,34 @@ const SupportPage: React.FC = () => {
         ))}
       </section>
 
-      {/* FAQ Section */}
+      {/* ======================
+          FAQ SECTION (UPGRADED)
+      ======================= */}
       <section id="faqs" className="max-w-4xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold text-orange-600 mb-2">FAQS</h2>
-        <h3 className="text-2xl font-medium mb-6">Frequently Asked Questions</h3>
+        <h2 className="text-3xl font-extrabold text-orange-600 mb-2">
+          FAQs
+        </h2>
+        <h3 className="text-2xl font-semibold text-gray-900 mb-6">
+          Frequently Asked Questions
+        </h3>
+
         <div className="flex flex-col gap-4">
           {faqs.map((faq, idx) => (
-            <div key={idx} className="bg-white rounded-2xl shadow-md overflow-hidden">
+            <div key={idx} className="bg-white rounded-2xl shadow-md border border-orange-100 overflow-hidden">
               <button
-                className="w-full text-left px-6 py-4 flex justify-between items-center font-medium text-gray-800 hover:bg-gray-50 transition"
+                className="w-full text-left px-6 py-4 flex justify-between items-center font-medium text-gray-800 hover:bg-orange-50 transition"
                 onClick={() => setFaqActive(faqActive === idx ? null : idx)}
               >
                 {faq.question}
                 <ChevronDown
-                  className={`transition-transform ${faqActive === idx ? "rotate-180" : ""}`}
+                  className={`transition-transform duration-300 ${
+                    faqActive === idx ? "rotate-180" : ""
+                  }`}
                 />
               </button>
+
               {faqActive === idx && (
-                <div className="px-6 py-4 text-gray-600 border-t border-gray-200">
+                <div className="px-6 py-4 text-gray-700 border-t border-orange-200 bg-orange-50/40">
                   {faq.answer}
                 </div>
               )}
@@ -193,28 +185,59 @@ const SupportPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Contact Form */}
-      <section className="bg-white py-16">
+      {/* ======================
+          CONTACT FORM (UPGRADED)
+      ======================= */}
+      <section className="bg-white py-20 border-t border-orange-100">
         <div className="max-w-3xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-orange-600 mb-2">CONTACT US</h2>
-          <h3 className="text-2xl font-medium mb-6">Still Need Help?</h3>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <input name="name" type="text" placeholder="Full Name" className="w-full px-4 py-3 border rounded-xl focus:outline-none" required />
-            <input name="email" type="email" placeholder="Email Address" className="w-full px-4 py-3 border rounded-xl focus:outline-none" required />
-            <select name="subject" className="w-full px-4 py-3 border rounded-xl focus:outline-none">
+          <h2 className="text-3xl font-extrabold text-orange-600 mb-2">
+            CONTACT US
+          </h2>
+          <h3 className="text-2xl font-semibold mb-6">Still Need Help?</h3>
+
+          <form className="flex flex-col gap-5">
+            <input
+              name="name"
+              type="text"
+              placeholder="Full Name"
+              className="w-full px-5 py-3 border rounded-xl focus:outline-orange-500 shadow-sm"
+              required
+            />
+
+            <input
+              name="email"
+              type="email"
+              placeholder="Email Address"
+              className="w-full px-5 py-3 border rounded-xl focus:outline-orange-500 shadow-sm"
+              required
+            />
+
+            <select
+              name="subject"
+              className="w-full px-5 py-3 border rounded-xl focus:outline-orange-500 shadow-sm"
+            >
               <option>Technical Support</option>
               <option>Billing Inquiry</option>
               <option>Course Content</option>
               <option>Feedback/Suggestions</option>
               <option>Other</option>
             </select>
-            <textarea name="message" placeholder="Your Message" className="w-full px-4 py-3 border rounded-xl focus:outline-none" rows={6} required></textarea>
-            <button className="w-full py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition">
+
+            <textarea
+              name="message"
+              placeholder="Your Message"
+              rows={6}
+              className="w-full px-5 py-3 border rounded-xl focus:outline-orange-500 shadow-sm"
+              required
+            ></textarea>
+
+            <button className="w-full py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-500 shadow-md transition">
               Send Message
             </button>
           </form>
         </div>
       </section>
+
     </div>
   );
 };

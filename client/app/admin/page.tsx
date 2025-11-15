@@ -1,29 +1,50 @@
 "use client";
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
-export default function AdminDashboard() {
-  return (
-    <ProtectedRoute allowedRoles={["admin"]}>
-      <div className="min-h-screen bg-gray-100 p-6">
-        <h1 className="text-3xl font-semibold text-indigo-700 mb-6">Admin Dashboard</h1>
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { requireAuthCheck } from "@/lib/auth";
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-md">
-            <h2 className="text-xl font-medium mb-2">Manage Users</h2>
-            <p className="text-gray-500 text-sm">Add, update, or remove user accounts.</p>
-          </div>
+import Sidebar from "@/components/admin/Sidebar";
+import Navbar from "@/components/admin/Navbar";
+import StatCard from "@/components/admin/StatCard";
+import ChartCard from "@/components/admin/ChartCard";
 
-          <div className="bg-white p-6 rounded-2xl shadow-md">
-            <h2 className="text-xl font-medium mb-2">Manage Courses</h2>
-            <p className="text-gray-500 text-sm">Create and update course details.</p>
-          </div>
+export default function DashboardPage() {
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
 
-          <div className="bg-white p-6 rounded-2xl shadow-md">
-            <h2 className="text-xl font-medium mb-2">Messages</h2>
-            <p className="text-gray-500 text-sm">View messages from contact form.</p>
-          </div>
-        </div>
+  useEffect(() => {
+    // Allow ONLY admins
+    const ok = requireAuthCheck(router, ["admin"]);
+    if (!ok) return;
+
+    setReady(true);
+  }, []);
+
+  if (!ready) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-lg text-gray-600">Checking access...</p>
       </div>
-    </ProtectedRoute>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar />
+      <div className="flex-1 flex flex-col">
+        <Navbar />
+        <main className="p-6 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatCard title="Total Users" value="2,450" icon={undefined} color={""} />
+            <StatCard title="Active Courses" value="35" icon={undefined} color={""} />
+            <StatCard title="Revenue" value="$12,300" icon={undefined} color={""} />
+            <StatCard title="Pending Tickets" value="7" icon={undefined} color={""} />
+          </div>
+
+          <ChartCard />
+        </main>
+      </div>
+    </div>
   );
 }

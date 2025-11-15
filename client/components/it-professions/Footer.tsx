@@ -1,103 +1,183 @@
 "use client";
 
 import Image from "next/image";
-import logoImg from "../../public/logo.png";
-import { 
-  FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaYoutube, 
-  FaGooglePlay, FaApple 
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+  FaYoutube,
+  FaGooglePlay,
+  FaApple,
 } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-[#c5d1ff] pt-16 pb-8 text-black">
-      
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
+    <footer className="bg-orange-50 w-full px-6 py-16 border-t border-orange-200">
+      <div className="max-w-[1250px] mx-auto">
         
-        {/* Column 1: Logo & Socials */}
-        <div className="flex flex-col gap-6">
-          <Image src={logoImg} alt="Dousoft Eduverse Logo" className="w-40 h-auto" />
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-14">
+          
+          {/* Column 1: Logo + Social + App */}
+          <div>
+            <Image
+              src="/logo.png"
+              alt="Dousoft Eduverse Logo"
+              width={140}
+              height={50}
+              className="mb-6"
+            />
 
-          {/* Social Icons */}
-          <div className="flex gap-4 text-white">
-            <FaFacebookF className="w-5 h-5 hover:text-gray-800 transition" />
-            <FaTwitter className="w-5 h-5 hover:text-gray-800 transition" />
-            <FaInstagram className="w-5 h-5 hover:text-gray-800 transition" />
-            <FaLinkedinIn className="w-5 h-5 hover:text-gray-800 transition" />
-            <FaYoutube className="w-5 h-5 hover:text-gray-800 transition" />
+            {/* Social Icons */}
+            <div className="flex gap-4 mb-6">
+              {[FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaYoutube].map(
+                (Icon, idx) => (
+                  <a
+                    key={idx}
+                    href="#"
+                    className="w-10 h-10 flex items-center justify-center bg-white 
+                    shadow-sm rounded-full text-gray-600 
+                    hover:bg-orange-500 hover:text-white transition transform hover:-translate-y-1"
+                  >
+                    <Icon size={18} />
+                  </a>
+                )
+              )}
+            </div>
+
+            {/* App Buttons */}
+            <div className="flex gap-4 flex-wrap">
+              <a
+                href="#"
+                className="flex items-center gap-3 bg-black text-white rounded-xl px-4 py-2.5 hover:opacity-80 transition"
+              >
+                <FaGooglePlay size={24} />
+                <div className="text-xs leading-tight">
+                  <p>GET IT ON</p>
+                  <p className="font-semibold text-sm">Google Play</p>
+                </div>
+              </a>
+
+              <a
+                href="#"
+                className="flex items-center gap-3 bg-black text-white rounded-xl px-4 py-2.5 hover:opacity-80 transition"
+              >
+                <FaApple size={24} />
+                <div className="text-xs leading-tight">
+                  <p>DOWNLOAD ON THE</p>
+                  <p className="font-semibold text-sm">App Store</p>
+                </div>
+              </a>
+            </div>
           </div>
 
-          {/* App Stores */}
-          <div className="flex flex-col gap-3">
-            <a href="#" className="flex items-center gap-3 bg-white/30 hover:bg-white/50 px-3 py-2 rounded-lg transition">
-              <FaGooglePlay className="w-6 h-6" />
-              <div className="text-left">
-                <p className="text-xs text-gray-700">GET IT ON</p>
-                <p className="font-semibold text-gray-900">Google Play</p>
-              </div>
-            </a>
-            <a href="#" className="flex items-center gap-3 bg-white/30 hover:bg-white/50 px-3 py-2 rounded-lg transition">
-              <FaApple className="w-6 h-6" />
-              <div className="text-left">
-                <p className="text-xs text-gray-700">DOWNLOAD ON THE</p>
-                <p className="font-semibold text-gray-900">App Store</p>
-              </div>
-            </a>
+          {/* Column 2: Company Links */}
+          <div>
+            <h4 className="font-semibold text-lg text-gray-900 mb-4 
+              border-b-2 border-orange-600 inline-block pb-1">
+              COMPANY
+            </h4>
+
+            <div className="space-y-2">
+              {["About Us", "Contact Us", "Careers", "Updates"].map((item, idx) => (
+                <a
+                  key={idx}
+                  href="#"
+                  className="block text-gray-600 hover:text-orange-600 transition"
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 3: IT Centers */}
+          <div>
+            <h4 className="font-semibold text-lg text-gray-900 mb-4 
+              border-b-2 border-orange-600 inline-block pb-1">
+              OUR IT CENTERS
+            </h4>
+
+            <div className="space-y-2">
+              {["New Delhi", "Bengaluru", "Hyderabad", "Pune"].map((center, idx) => (
+                <a
+                  key={idx}
+                  href="#"
+                  className="block text-gray-600 hover:text-orange-600 transition"
+                >
+                  {center}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Column 4: IT Courses */}
+          <div>
+            <h4 className="font-semibold text-lg text-gray-900 mb-4 
+              border-b-2 border-orange-600 inline-block pb-1">
+              POPULAR IT COURSES
+            </h4>
+
+            <div className="space-y-2">
+              {[
+                "Full Stack Development",
+                "Python for Data Science",
+                "React Native Basics",
+                "UI/UX Design",
+              ].map((course, idx) => (
+                <a
+                  key={idx}
+                  href="#"
+                  className="block text-gray-600 hover:text-orange-600 transition"
+                >
+                  {course}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Column 2: Company */}
-        <div className="flex flex-col gap-3">
-          <h4 className="font-bold text-lg mb-2">COMPANY</h4>
-          <a href="/about" className="hover:text-gray-700 transition">About Us</a>
-          <a href="/contact" className="hover:text-gray-700 transition">Contact Us</a>
-          <a href="/career" className="hover:text-gray-700 transition">Careers</a>
-          <a href="/blog" className="hover:text-gray-700 transition">Blog & Updates</a>
+        {/* Useful Links */}
+        <div className="mb-14">
+          <h4 className="font-semibold text-lg text-gray-900 mb-3 
+            border-b-2 border-orange-600 inline-block pb-1">
+            USEFUL LINKS
+          </h4>
+
+          <div className="flex flex-wrap gap-3">
+            {[
+              "Best Web Dev Courses in Delhi",
+              "Python Training in Mumbai",
+              "React.js Bootcamp in Pune",
+              "Java Full Stack Course in Hyderabad",
+              "UI/UX Design Classes in Chennai",
+              "Android Development Online",
+            ].map((link, idx) => (
+              <a
+                key={idx}
+                href="#"
+                className="bg-white border border-gray-200 text-gray-700 
+                px-3 py-1.5 rounded-lg text-sm 
+                hover:border-orange-500 hover:text-orange-600 transition"
+              >
+                {link}
+              </a>
+            ))}
+          </div>
         </div>
 
-        {/* Column 3: Training Centers */}
-        <div className="flex flex-col gap-3">
-          <h4 className="font-bold text-lg mb-2">OUR TRAINING CENTERS</h4>
-          <a href="/training-center" className="hover:text-gray-700 transition">New Delhi</a>
-          <a href="/training-center" className="hover:text-gray-700 transition">Mumbai</a>
-          <a href="/training-center" className="hover:text-gray-700 transition">Hyderabad</a>
-          <a href="/training-center" className="hover:text-gray-700 transition">Bengaluru</a>
-        </div>
+        {/* Bottom Section */}
+        <div className="border-t pt-6 border-gray-300 flex flex-wrap justify-between items-center gap-4 text-gray-600 text-sm">
+          <div className="flex gap-4 items-center">
+            <a href="#" className="hover:text-orange-600 transition">Privacy Policy</a>
+            <span>|</span>
+            <a href="#" className="hover:text-orange-600 transition">Terms of Condition</a>
+          </div>
 
-        {/* Column 4: Popular Courses */}
-        <div className="flex flex-col gap-3">
-          <h4 className="font-bold text-lg mb-2">POPULAR COURSES</h4>
-          <a href="/full-stack-web-development" className="hover:text-gray-700 transition">Full Stack Web Development</a>
-          <a href="/python-for-beginners" className="hover:text-gray-700 transition">Python for Data Science</a>
-          <a href="/react-native-mobile-apps" className="hover:text-gray-700 transition">Mobile App Development</a>
-          <a href="/ui-ux-principles" className="hover:text-gray-700 transition">UI/UX Design Fundamentals</a>
-        </div>
-      </div>
-
-      {/* Useful Links */}
-      <div className="max-w-7xl mx-auto px-6 mt-10">
-        <h4 className="font-bold text-lg mb-4">USEFUL LINKS</h4>
-        <div className="flex flex-wrap gap-4 text-sm">
-          <a href="#!" className="hover:underline">Best Web Development Courses in Delhi</a>
-          <a href="#!" className="hover:underline">Python Training in Mumbai</a>
-          <a href="#!" className="hover:underline">React.js Bootcamp in Pune</a>
-          <a href="#!" className="hover:underline">Java Full Stack Courses in Hyderabad</a>
-          <a href="#!" className="hover:underline">UI/UX Design Classes in Chennai</a>
-          <a href="#!" className="hover:underline">Android Development Courses Online</a>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="border-t border-gray-300 mt-10"></div>
-
-      {/* Footer Bottom */}
-      <div className="max-w-7xl mx-auto px-6 mt-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-700">
-        <div className="flex gap-2">
-          <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
-          <span>|</span>
-          <a href="/terms" className="hover:underline">Terms & Conditions</a>
-        </div>
-        <div className="mt-2 md:mt-0 flex items-center gap-1">
-          <span>© 2025 Dousoft Eduverse. All Rights Reserved.</span>
+          <div className="text-gray-700 font-medium">
+            &copy; 2025 Dousoft Eduverse. All Rights Reserved.
+          </div>
         </div>
       </div>
     </footer>

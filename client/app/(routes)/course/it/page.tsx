@@ -1,4 +1,4 @@
-import Navbar from "@/components/course/IT/Navbar";
+import Navbar from "@/components/it-professions/Navbar";
 import Card from "@/components/course/IT/Card";
 import Footer from "@/components/it-professions/Footer";
 

@@ -1,125 +1,183 @@
 "use client";
+
 import { useState } from "react";
-import API from "@/lib/api";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "user",
   });
-  const [message, setMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
+
     if (form.password !== form.confirmPassword) {
-      setMessage("❌ Passwords do not match!");
+      setMsg("❌ Passwords do not match!");
       return;
     }
-    setMessage("⏳ Registering...");
+
+    setLoading(true);
+    setMsg("⏳ Creating your account...");
 
     try {
-      const res = await API.post("/auth/register", {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-      });
-      setMessage("✅ Account created successfully! Please login.");
-      setForm({ name: "", email: "", password: "", confirmPassword: "" });
+      const res = await api.post("/auth/register", form);
+
+      if (res.data?.success) {
+        setMsg("✅ Account created! Redirecting to login...");
+        setTimeout(() => router.push("/auth/login"), 1200);
+      } else {
+        setMsg("❌ " + (res.data?.message || "Registration failed"));
+      }
     } catch (err: any) {
-      setMessage("❌ " + (err?.response?.data?.message || "Registration failed"));
+      setMsg("❌ " + (err?.response?.data?.message || "Server error"));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center text-black justify-center bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 px-4">
-      <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md border border-indigo-100">
-        <h2 className="text-3xl font-bold text-center text-indigo-700 mb-2">Create Your Account</h2>
-        <p className="text-center text-gray-500 mb-8">Join <span className="font-semibold text-indigo-600">Eduverse</span> and start learning today!</p>
+    <div className="min-h-screen flex flex-col md:flex-row font-poppins">
+      
+      {/* Left Section */}
+      <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-gradient-to-br from-indigo-500 to-indigo-700 text-white">
+        <img src="/assets/login.webp" className="w-3/4 max-w-md animate-float" />
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Full Name</label>
+        {/* Text below image → you requested this */}
+        <div className="text-center mt-6">
+          <h2 className="text-3xl font-semibold">Join Eduverse Today!</h2>
+          <p className="opacity-80 text-sm mt-2">Start your journey with us</p>
+        </div>
+      </div>
+
+      {/* Right Section: Form */}
+      <div className="flex flex-1 justify-center items-center bg-gray-50">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-6">
+
+          <div className="flex justify-center mb-6">
+            <img src="/logo.png" className="h-12 object-contain" />
+          </div>
+
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2">Create Account</h2>
+
+          {msg && (
+            <p
+              className={`text-sm p-2 mb-4 rounded ${
+                msg.startsWith("✅")
+                  ? "text-green-600 bg-green-50 border border-green-200"
+                  : "text-red-600 bg-red-50 border border-red-200"
+              }`}
+            >
+              {msg}
+            </p>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm mb-1">Full Name</label>
             <input
               name="name"
               value={form.name}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-400 outline-none transition"
-              placeholder="Enter your full name"
+              type="text"
+              placeholder="Enter your name"
+              className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Email Address</label>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm mb-1">Email</label>
             <input
               name="email"
-              type="email"
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+              type="email"
               placeholder="Enter your email"
+              className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Password</label>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm mb-1">Password</label>
             <input
               name="password"
-              type="password"
               value={form.password}
               onChange={handleChange}
-              required
               minLength={6}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-400 outline-none transition"
-              placeholder="Enter a strong password"
+              required
+              type="password"
+              placeholder="Enter password"
+              className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Confirm Password</label>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm mb-1">Confirm Password</label>
             <input
               name="confirmPassword"
-              type="password"
               value={form.confirmPassword}
               onChange={handleChange}
-              required
               minLength={6}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-400 outline-none transition"
-              placeholder="Re-enter your password"
+              required
+              type="password"
+              placeholder="Confirm password"
+              className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm mb-1">Role</label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="user">User</option>
+              <option value="teacher">Teacher</option>
+            </select>
           </div>
 
           <button
+            disabled={loading}
             type="submit"
-            className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 shadow-lg hover:shadow-indigo-300/50 transition-all"
+            className="w-full py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-60"
           >
-            Register
+            {loading ? "Creating account..." : "Register"}
           </button>
+
+          <p className="text-center text-gray-500 text-sm mt-6">
+            Already have an account?{" "}
+            <a href="/auth/login" className="text-indigo-600 font-medium">
+              Sign in
+            </a>
+          </p>
         </form>
-
-        {message && (
-          <p className="mt-6 text-center text-gray-700 font-medium">{message}</p>
-        )}
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?{" "}
-          <a
-            href="/auth/login"
-            className="text-indigo-600 font-semibold hover:underline"
-          >
-            Login here
-          </a>
-        </p>
       </div>
-    </div>
-    
-  );
 
+      <style jsx>{`
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-15px); }
+          100% { transform: translateY(0px); }
+        }
+      `}</style>
+    </div>
+  );
 }

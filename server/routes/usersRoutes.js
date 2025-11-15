@@ -1,31 +1,25 @@
+// routes/usersRoutes.js
 import express from "express";
+import { verifyToken, authorizeRole } from "../middleware/auth.js";
 import User from "../models/User.js";
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-// admin: get all users
-router.get("/", protect, adminOnly, async (req, res) => {
-  try {
-    const users = await User.find().select("-password").sort({ createdAt: -1 });
-    res.json({ success: true, users });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+// Admin-only: list all users
+router.get("/", verifyToken, authorizeRole(["admin"]), async (req, res) => {
+  const users = await User.find().select("-password");
+  res.json(users);
 });
 
-// admin: change role
-router.put("/:id/role", protect, adminOnly, async (req, res) => {
-  try {
-    const { role } = req.body;
-    if (!["admin", "teacher", "student"].includes(role)) return res.status(400).json({ success: false, message: "Invalid role" });
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-    user.role = role;
-    await user.save();
-    res.json({ success: true, user: { id: user._id, name: user.name, role: user.role } });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+// Admin-only: change role or delete user
+router.patch("/:id/role", verifyToken, authorizeRole(["admin"]), async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, { role: req.body.role }, { new: true });
+  res.json(user);
+});
+
+router.delete("/:id", verifyToken, authorizeRole(["admin"]), async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted" });
 });
 
 export default router;
