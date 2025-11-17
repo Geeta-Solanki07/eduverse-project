@@ -1,38 +1,15 @@
-"use client";
-
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
-export function getTokenPayload() {
-  if (typeof window === "undefined") return null;
-
-  const token = localStorage.getItem("token");
-  if (!token) return null;
-
-  try {
-    return JSON.parse(atob(token.split(".")[1]));
-  } catch {
-    return null;
-  }
-}
-
-export function requireAuthCheck(
-  router: AppRouterInstance,
-  allowedRoles: string[] = ["user"]
-) {
-  if (typeof window === "undefined") return false;
-
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
-
-  if (!token || !role) {
-    router.push("/auth/login");
-    return false;
+export function logout(router: AppRouterInstance) {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
   }
 
-  if (!allowedRoles.includes(role)) {
-    router.push("/auth/login");
-    return false;
-  }
+  // Clear cookie token
+  document.cookie =
+    "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=None; Secure";
 
-  return true;
+  router.replace("/auth/login");
 }

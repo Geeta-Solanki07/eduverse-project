@@ -11,30 +11,30 @@ interface User {
   role: string;
 }
 
-export default function AdminUsers() {
+export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
 
-  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("https://eduverse-project.onrender.com/admin/users");
+      const data = await res.json();
+      setUsers(data.users || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch("https://eduverse-project.onrender.com/admin/users");
-        const data = await res.json();
-        setUsers(data.users || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure?")) return;
+    if (!confirm("Are you sure you want to delete this user?")) return;
     try {
       const res = await fetch(`https://eduverse-project.onrender.com/admin/users/${id}`, { method: "DELETE" });
       if (res.ok) setUsers(users.filter((u) => u._id !== id));
@@ -43,11 +43,10 @@ export default function AdminUsers() {
     }
   };
 
-  // Add or Edit User
   const handleSaveUser = async (user: User) => {
     try {
       if (user._id) {
-        // Edit user
+        // Update user
         const res = await fetch(`https://eduverse-project.onrender.com/admin/users/${user._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -55,7 +54,7 @@ export default function AdminUsers() {
         });
         if (res.ok) setUsers(users.map((u) => (u._id === user._id ? user : u)));
       } else {
-        // Add user
+        // Add new user
         const res = await fetch(`https://eduverse-project.onrender.com/admin/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

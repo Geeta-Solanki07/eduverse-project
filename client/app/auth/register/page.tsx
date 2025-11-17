@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
+import useAuthRedirect from "@/app/hooks/useAuthRedirect";
 
 export default function RegisterPage() {
+  useAuthRedirect(); // 🔥 Prevent access when logged in
+
   const router = useRouter();
   const [form, setForm] = useState({
     name: "",
@@ -17,9 +20,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: any) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -39,10 +41,12 @@ export default function RegisterPage() {
         setMsg("✅ Account created! Redirecting to login...");
         setTimeout(() => router.push("/auth/login"), 1200);
       } else {
-        setMsg("❌ " + (res.data?.message || "Registration failed"));
+        setMsg("❌ " + res.data?.message);
       }
     } catch (err: any) {
-      setMsg("❌ " + (err?.response?.data?.message || "Server error"));
+      setMsg(
+        "❌ " + (err?.response?.data?.message || "Something went wrong!")
+      );
     } finally {
       setLoading(false);
     }
@@ -51,18 +55,14 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-poppins">
       
-      {/* Left Section */}
       <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-gradient-to-br from-indigo-500 to-indigo-700 text-white">
         <img src="/assets/login.webp" className="w-3/4 max-w-md animate-float" />
-
-        {/* Text below image → you requested this */}
         <div className="text-center mt-6">
           <h2 className="text-3xl font-semibold">Join Eduverse Today!</h2>
           <p className="opacity-80 text-sm mt-2">Start your journey with us</p>
         </div>
       </div>
 
-      {/* Right Section: Form */}
       <div className="flex flex-1 justify-center items-center bg-gray-50">
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-6">
 
@@ -73,13 +73,11 @@ export default function RegisterPage() {
           <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2">Create Account</h2>
 
           {msg && (
-            <p
-              className={`text-sm p-2 mb-4 rounded ${
-                msg.startsWith("✅")
-                  ? "text-green-600 bg-green-50 border border-green-200"
-                  : "text-red-600 bg-red-50 border border-red-200"
-              }`}
-            >
+            <p className={`text-sm p-2 mb-4 rounded ${
+              msg.startsWith("✅")
+                ? "text-green-600 bg-green-50 border border-green-200"
+                : "text-red-600 bg-red-50 border border-red-200"
+            }`}>
               {msg}
             </p>
           )}
@@ -173,9 +171,9 @@ export default function RegisterPage() {
           animation: float 6s ease-in-out infinite;
         }
         @keyframes float {
-          0% { transform: translateY(0px); }
+          0% { transform: translateY(0); }
           50% { transform: translateY(-15px); }
-          100% { transform: translateY(0px); }
+          100% { transform: translateY(0); }
         }
       `}</style>
     </div>

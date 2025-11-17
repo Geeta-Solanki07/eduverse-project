@@ -1,10 +1,11 @@
-import React from "react";
+"use client";
 import { motion } from "framer-motion";
+import React from "react";
 
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   color: string;
   dark?: boolean;
 }
@@ -15,6 +16,7 @@ export default function StatCard({ title, value, icon, color, dark }: StatCardPr
     green: dark ? "bg-green-900 text-green-300" : "bg-green-100 text-green-600",
     yellow: dark ? "bg-yellow-900 text-yellow-300" : "bg-yellow-100 text-yellow-600",
     purple: dark ? "bg-purple-900 text-purple-300" : "bg-purple-100 text-purple-600",
+    red: dark ? "bg-red-900 text-red-300" : "bg-red-100 text-red-600",
   };
 
   return (

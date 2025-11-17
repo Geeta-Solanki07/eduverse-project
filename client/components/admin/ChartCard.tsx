@@ -1,25 +1,24 @@
 "use client";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-const data = [
-  { name: "Jan", users: 400 },
-  { name: "Feb", users: 800 },
-  { name: "Mar", users: 1200 },
-  { name: "Apr", users: 1600 },
-  { name: "May", users: 1800 },
-  { name: "Jun", users: 2000 },
-];
+interface ChartCardProps {
+  data: { month: number; users: number; revenue: number }[];
+}
 
-export default function ChartCard() {
+export default function ChartCard({ data }: ChartCardProps) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const chartData = data.map(d => ({ month: months[d.month - 1], users: d.users, revenue: d.revenue }));
+
   return (
-    <div className="bg-white rounded-xl shadow-md p-6">
-      <h3 className="text-gray-700 font-semibold mb-4">User Growth Overview</h3>
+    <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+      <h3 className="text-gray-700 font-semibold mb-4">Monthly Users & Revenue</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <XAxis dataKey="name" />
+        <LineChart data={chartData}>
+          <XAxis dataKey="month" />
           <YAxis />
           <Tooltip />
-          <Line type="monotone" dataKey="users" stroke="#2563eb" strokeWidth={3} />
+          <Line type="monotone" dataKey="users" stroke="#3b82f6" strokeWidth={3} />
+          <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={3} />
         </LineChart>
       </ResponsiveContainer>
     </div>
