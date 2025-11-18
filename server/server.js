@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS FIXED FOR YOUR NEXT.JS
+// CORS FIXED FOR NEXT.JS + RENDER
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://eduverse-project.vercel.app"],
@@ -20,11 +20,25 @@ app.use(
   })
 );
 
+// TEST ROUTE (to avoid Cannot GET /)
+app.get("/", (req, res) => {
+  res.send("Eduverse Backend is Running ✔");
+});
+
+// ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminStats);
 
-// DB + SERVER
-mongoose.connect(process.env.MONGO_URI).then(() => {
-  console.log("✔ MongoDB Connected");
-  app.listen(5000, () => console.log("✔ Server running at 5000"));
-});
+// SET PORT FOR RENDER & LOCAL
+const PORT = process.env.PORT || 5000;
+
+// DB + SERVER START
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✔ MongoDB Connected");
+    app.listen(PORT, () => console.log(`✔ Server running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+  });
