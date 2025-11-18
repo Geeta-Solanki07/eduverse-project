@@ -17,9 +17,13 @@ export default function UsersPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editUser, setEditUser] = useState<User | null>(null);
 
+  const API = "https://eduverse-project.onrender.com/api/admin/users";
+
   const fetchUsers = async () => {
     try {
-      const res = await fetch("https://eduverse-project.onrender.com/admin/users");
+      const res = await fetch(API, {
+        credentials: "include",
+      });
       const data = await res.json();
       setUsers(data.users || []);
     } catch (err) {
@@ -34,9 +38,14 @@ export default function UsersPage() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+    if (!confirm("Delete this user?")) return;
+
     try {
-      const res = await fetch(`https://eduverse-project.onrender.com/admin/users/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API}/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
       if (res.ok) setUsers(users.filter((u) => u._id !== id));
     } catch (err) {
       console.error(err);
@@ -46,20 +55,23 @@ export default function UsersPage() {
   const handleSaveUser = async (user: User) => {
     try {
       if (user._id) {
-        // Update user
-        const res = await fetch(`https://eduverse-project.onrender.com/admin/users/${user._id}`, {
+        const res = await fetch(`${API}/${user._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(user),
         });
-        if (res.ok) setUsers(users.map((u) => (u._id === user._id ? user : u)));
+
+        if (res.ok)
+          setUsers(users.map((u) => (u._id === user._id ? user : u)));
       } else {
-        // Add new user
-        const res = await fetch(`https://eduverse-project.onrender.com/admin/users`, {
+        const res = await fetch(API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(user),
         });
+
         const data = await res.json();
         setUsers([...users, data.user]);
       }
@@ -74,13 +86,18 @@ export default function UsersPage() {
   return (
     <div className="flex">
       <Sidebar />
+
       <div className="flex-1 min-h-screen p-6 bg-gray-50">
         <Navbar />
+
         <div className="flex justify-between items-center mt-6 mb-4">
-          <h1 className="text-2xl font-semibold text-gray-800">👥 Manage Users</h1>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            👥 Manage Users ({users.length})
+          </h1>
+
           <button
             onClick={() => setModalOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
           >
             + Add User
           </button>
@@ -101,23 +118,38 @@ export default function UsersPage() {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user._id} className="border-b hover:bg-gray-50">
+                  <tr
+                    key={user._id}
+                    className="border-b hover:bg-gray-50 transition"
+                  >
                     <td className="py-3 px-4">{user.name}</td>
                     <td className="py-3 px-4">{user.email}</td>
-                    <td className="py-3 px-4 capitalize">{user.role}</td>
-                    <td className="py-3 px-4 text-center flex justify-center gap-2">
+                    <td className="py-3 px-4 capitalize">
+                      <span
+                        className={`px-2 py-1 rounded text-white text-sm ${
+                          user.role === "admin"
+                            ? "bg-purple-600"
+                            : "bg-green-600"
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+
+                    <td className="py-3 px-4 flex justify-center gap-2">
                       <button
                         onClick={() => {
                           setEditUser(user);
                           setModalOpen(true);
                         }}
-                        className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition"
+                        className="bg-yellow-500 text-white px-3 py-1 rounded-md"
                       >
                         Edit
                       </button>
+
                       <button
                         onClick={() => handleDelete(user._id!)}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                        className="bg-red-500 text-white px-3 py-1 rounded-md"
                       >
                         Delete
                       </button>
@@ -131,11 +163,11 @@ export default function UsersPage() {
 
         <UserModal
           show={modalOpen}
+          onSave={handleSaveUser}
           onClose={() => {
             setModalOpen(false);
             setEditUser(null);
           }}
-          onSave={handleSaveUser}
           editUser={editUser}
         />
       </div>
