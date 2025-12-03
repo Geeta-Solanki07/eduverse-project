@@ -32,10 +32,10 @@ export const metadata: Metadata = {
 export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
 
+  const { slug } = params;
   let course: ICourse | null = null;
 
   try {
@@ -67,16 +67,12 @@ export default async function Page({
     <>
       <Navbar />
 
-      {/* HERO SECTION */}
-      <header className="bg-linear-to-br text-black from-blue-50 to-white py-20">
+      <header className="bg-gradient-to-br from-blue-50 to-white py-20">
         <div className="max-w-7xl mx-auto px-6 md:px-10">
           <div className="mb-6 text-sm text-gray-600">
             <Link href="/">Home</Link> /{" "}
-            <Link href="/course/it" className="ml-1">
-              Courses
-            </Link>{" "}
-            /{" "}
-            <span className="ml-1 font-medium text-gray-900">
+            <Link href="/course/it">Courses</Link> /{" "}
+            <span className="font-medium text-gray-900">
               {course.title}
             </span>
           </div>
@@ -87,11 +83,11 @@ export default async function Page({
                 {course.title}
               </h1>
 
-              <p className="text-lg text-gray-700 max-w-2xl mb-8">
+              <p className="text-lg text-gray-700 mb-8">
                 {course.summary}
               </p>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10">
                 <div className="bg-white p-4 shadow rounded-lg">
                   <p className="text-sm text-gray-500">Level</p>
                   <p className="font-semibold text-gray-800">
@@ -133,10 +129,9 @@ export default async function Page({
         </div>
       </header>
 
-      {/* LESSONS + SIDEBAR */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10">
-          {/* Lessons */}
+
           <div className="md:col-span-2">
             <h2 className="text-3xl font-bold mb-6">Lessons</h2>
 
@@ -154,7 +149,6 @@ export default async function Page({
             )}
           </div>
 
-          {/* Sidebar */}
           <aside>
             <div className="p-6 bg-white shadow-lg rounded-lg border">
               <h3 className="text-xl font-semibold mb-4">Course Price</h3>
