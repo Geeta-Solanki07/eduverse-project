@@ -22,16 +22,15 @@ interface ICourse {
   lessons?: Lesson[];
 }
 
-type PageProps = {
-  params: {
-    slug: string;
-  };
-};
-
 /* ---------------- PAGE ---------------- */
 
-export default async function Page({ params }: PageProps) {
-  const { slug } = params;
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  // IMPORTANT FIX HERE ✅
+  const { slug } = await params;
 
   let course: ICourse | null = null;
 
@@ -123,17 +122,17 @@ export default async function Page({ params }: PageProps) {
         </div>
       </header>
 
-      {/* LESSONS / SIDEBAR */}
+      {/* LESSONS + SIDEBAR */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10">
-          {/* Left Side - Lessons */}
+          {/* Lessons */}
           <div className="md:col-span-2">
             <h2 className="text-3xl font-bold mb-6">Lessons</h2>
 
             {course.lessons && course.lessons.length > 0 ? (
-              course.lessons.map((lesson, index) => (
+              course.lessons.map((lesson, i) => (
                 <div
-                  key={index}
+                  key={i}
                   className="p-4 mb-3 bg-gray-50 border rounded-lg"
                 >
                   {lesson.title}
@@ -144,12 +143,10 @@ export default async function Page({ params }: PageProps) {
             )}
           </div>
 
-          {/* Right Side - Price Card */}
+          {/* Sidebar */}
           <aside>
             <div className="p-6 bg-white shadow-lg rounded-lg border">
-              <h3 className="text-xl font-semibold mb-4">
-                Course Price
-              </h3>
+              <h3 className="text-xl font-semibold mb-4">Course Price</h3>
 
               <p className="text-3xl font-bold text-orange-500 mb-6">
                 ₹{course.price}
