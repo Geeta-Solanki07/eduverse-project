@@ -70,7 +70,7 @@ export default function AboutSection() {
 
           {/* Button */}
           <a
-            href="/about"
+            href="/it/about"
             className="mt-6 inline-block px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500
             hover:opacity-90 text-white font-semibold rounded-xl shadow-lg transition-all duration-300"
           >

@@ -1,31 +1,23 @@
 "use client";
 import { useEffect, useState } from "react";
-import Sidebar from "@/components/admin/Sidebar";
-import Navbar from "@/components/admin/Navbar";
-import UserModal from "@/components/admin/UserModel";
+import api from "@/lib/api";
 
 interface User {
-  _id?: string;
+  _id: string;
   name: string;
   email: string;
-  role: string;
+  role: "admin" | "user" | "teacher";
+  createdAt: string;
 }
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editUser, setEditUser] = useState<User | null>(null);
-
-  const API = "https://eduverse-project.onrender.com/api/admin/users";
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(API, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      setUsers(data.users || []);
+      const res = await api.get("/admin/users");
+      setUsers(res.data.users);
     } catch (err) {
       console.error(err);
     } finally {
@@ -37,139 +29,70 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this user?")) return;
-
+  const changeRole = async (id: string, role: string) => {
     try {
-      const res = await fetch(`${API}/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (res.ok) setUsers(users.filter((u) => u._id !== id));
+      await api.put(`/admin/users/${id}/role`, { role });
+      fetchUsers(); // refresh list
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleSaveUser = async (user: User) => {
+  const deleteUser = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
     try {
-      if (user._id) {
-        const res = await fetch(`${API}/${user._id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(user),
-        });
-
-        if (res.ok)
-          setUsers(users.map((u) => (u._id === user._id ? user : u)));
-      } else {
-        const res = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(user),
-        });
-
-        const data = await res.json();
-        setUsers([...users, data.user]);
-      }
+      await api.delete(`/admin/users/${id}`);
+      fetchUsers();
     } catch (err) {
       console.error(err);
-    } finally {
-      setModalOpen(false);
-      setEditUser(null);
     }
   };
+
+  if (loading) return <p>Loading users...</p>;
 
   return (
-    <div className="flex">
-      <Sidebar />
-
-      <div className="flex-1 min-h-screen p-6 bg-gray-50">
-        <Navbar />
-
-        <div className="flex justify-between items-center mt-6 mb-4">
-          <h1 className="text-2xl font-semibold text-gray-800">
-            👥 Manage Users ({users.length})
-          </h1>
-
-          <button
-            onClick={() => setModalOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          >
-            + Add User
-          </button>
-        </div>
-
-        {loading ? (
-          <p className="text-gray-600">Loading users...</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full bg-white rounded-xl shadow-md overflow-hidden">
-              <thead className="bg-blue-600 text-white">
-                <tr>
-                  <th className="py-3 px-4 text-left">Name</th>
-                  <th className="py-3 px-4 text-left">Email</th>
-                  <th className="py-3 px-4 text-left">Role</th>
-                  <th className="py-3 px-4 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr
-                    key={user._id}
-                    className="border-b hover:bg-gray-50 transition"
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Users Management</h1>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-3 border">Name</th>
+              <th className="p-3 border">Email</th>
+              <th className="p-3 border">Role</th>
+              <th className="p-3 border">Joined</th>
+              <th className="p-3 border">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user._id} className="hover:bg-gray-50">
+                <td className="p-3 border">{user.name}</td>
+                <td className="p-3 border">{user.email}</td>
+                <td className="p-3 border">
+                  <select
+                    value={user.role}
+                    onChange={(e) => changeRole(user._id, e.target.value)}
+                    className="border rounded px-2 py-1"
                   >
-                    <td className="py-3 px-4">{user.name}</td>
-                    <td className="py-3 px-4">{user.email}</td>
-                    <td className="py-3 px-4 capitalize">
-                      <span
-                        className={`px-2 py-1 rounded text-white text-sm ${
-                          user.role === "admin"
-                            ? "bg-purple-600"
-                            : "bg-green-600"
-                        }`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-
-                    <td className="py-3 px-4 flex justify-center gap-2">
-                      <button
-                        onClick={() => {
-                          setEditUser(user);
-                          setModalOpen(true);
-                        }}
-                        className="bg-yellow-500 text-white px-3 py-1 rounded-md"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(user._id!)}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <UserModal
-          show={modalOpen}
-          onSave={handleSaveUser}
-          onClose={() => {
-            setModalOpen(false);
-            setEditUser(null);
-          }}
-          editUser={editUser}
-        />
+                    <option value="user">User</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </td>
+                <td className="p-3 border">{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td className="p-3 border">
+                  <button
+                    onClick={() => deleteUser(user._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

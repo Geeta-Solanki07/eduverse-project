@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
+
   const handleChange = (e: any) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 

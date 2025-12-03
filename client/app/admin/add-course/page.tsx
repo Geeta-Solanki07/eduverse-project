@@ -1,52 +1,58 @@
 "use client";
-
 import { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-export default function AddCoursePage() {
+export default function AddCourse() {
+  const router = useRouter();
   const [form, setForm] = useState({
     title: "",
     slug: "",
-    category: "beginner",
-    level: "IT",
-    description: "",
-    thumbnail: "",
+    summary: "",
+    price: 0,
+    instructor: "",
+    categoryKey: "",
+    subcategoryKey: "",
+    level: "Beginner",
   });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/courses/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    alert(data.message);
+    try {
+      await axios.post(
+        "http://localhost:5000/api/courses",
+        form,
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      alert("Course added successfully!");
+      router.push("/admin/courses");
+    } catch (err) {
+      console.error(err);
+      alert("Error adding course");
+    }
   };
 
   return (
-    <div className="px-10 py-16 max-w-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-orange-600">Add New Course</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="title" placeholder="Course Title" className="w-full border p-2 rounded" onChange={handleChange} />
-        <input name="slug" placeholder="Slug (url-name)" className="w-full border p-2 rounded" onChange={handleChange} />
-        <select name="category" className="w-full border p-2 rounded" onChange={handleChange}>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
+    <div className="max-w-xl mx-auto p-6 bg-white rounded shadow">
+      <h1 className="text-2xl font-bold mb-4">Add New Course</h1>
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <input name="title" placeholder="Title" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input name="slug" placeholder="Slug (unique)" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input name="summary" placeholder="Summary" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input type="number" name="price" placeholder="Price" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input name="instructor" placeholder="Instructor" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input name="categoryKey" placeholder="Category Key" onChange={handleChange} className="w-full p-2 border rounded" />
+        <input name="subcategoryKey" placeholder="Subcategory Key" onChange={handleChange} className="w-full p-2 border rounded" />
+        <select name="level" onChange={handleChange} className="w-full p-2 border rounded">
+          <option>Beginner</option>
+          <option>Intermediate</option>
+          <option>Advanced</option>
         </select>
-        <select name="level" className="w-full border p-2 rounded" onChange={handleChange}>
-          <option value="IT">IT</option>
-          <option value="Academics">Academics</option>
-        </select>
-        <textarea name="description" placeholder="Course Description" className="w-full border p-2 rounded" onChange={handleChange}></textarea>
-        <input name="thumbnail" placeholder="Image URL" className="w-full border p-2 rounded" onChange={handleChange} />
-        <button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
-          Add Course
-        </button>
+        <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded">Add Course</button>
       </form>
     </div>
   );

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
-export default function Navbar() {
+export default function NavbarHomepage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
