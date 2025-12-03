@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/it-professions/Navbar";
 import Footer from "@/components/it-professions/Footer";
-import api from "@/lib/api";
 
 /* ---------------- TYPES ---------------- */
 
@@ -22,6 +21,12 @@ interface ICourse {
   lessons?: Lesson[];
 }
 
+/* ✅ SEO METADATA */
+export const metadata: Metadata = {
+  title: "Course Details | EduVerse",
+  description: "Complete course details on EduVerse platform",
+};
+
 /* ---------------- PAGE ---------------- */
 
 export default async function Page({
@@ -29,14 +34,19 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  // IMPORTANT FIX HERE ✅
   const { slug } = await params;
 
   let course: ICourse | null = null;
 
   try {
-    const res = await api.get(`/courses?slug=${slug}`);
-    course = res.data;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/courses?slug=${slug}`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch");
+
+    course = await res.json();
   } catch (error) {
     console.error("Course fetch error:", error);
   }
@@ -111,10 +121,11 @@ export default async function Page({
 
             <div className="flex justify-center">
               <Image
-                src={course.image}
+                src={course.image || "/placeholder.png"}
                 alt={course.title}
                 width={550}
                 height={400}
+                priority
                 className="rounded-xl shadow-xl object-cover w-full"
               />
             </div>
