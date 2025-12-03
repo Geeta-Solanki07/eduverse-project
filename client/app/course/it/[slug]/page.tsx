@@ -1,7 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/it-professions/Navbar";
@@ -19,30 +16,22 @@ interface ICourse {
   lessons?: { title: string }[];
 }
 
-interface Props {
-  slug: string;
-}
+// Dynamic page for App Router
+export default async function Page({ params }: { params: { slug: string } }) {
+  const { slug } = params;
 
-export default function DynamicCoursePageWrapper({ params }: { params: { slug: string } }) {
-  return <DynamicCoursePage slug={params.slug} />;
-}
+  let course: ICourse | null = null;
 
-function DynamicCoursePage({ slug }: Props) {
-  const [course, setCourse] = useState<ICourse | null>(null);
+  try {
+    const res = await api.get(`/courses?slug=${slug}`);
+    course = res.data;
+  } catch (err) {
+    console.error(err);
+  }
 
-  useEffect(() => {
-    if (slug) {
-      api
-        .get(`/courses?slug=${slug}`)
-        .then(res => setCourse(res.data))
-        .catch(err => {
-          console.error("Error fetching course:", err);
-          setCourse(null);
-        });
-    }
-  }, [slug]);
-
-  if (!course) return <p className="text-center py-20">Loading...</p>;
+  if (!course) {
+    return <p className="text-center py-20">Course not found</p>;
+  }
 
   return (
     <>
@@ -53,7 +42,7 @@ function DynamicCoursePage({ slug }: Props) {
         <div className="max-w-7xl mx-auto px-6 md:px-10">
           <div className="mb-6 text-sm text-gray-600">
             <Link href="/">Home</Link> /{" "}
-            <Link href="/courses/it" className="ml-1">Courses</Link> /{" "}
+            <Link href="/course/it" className="ml-1">Courses</Link> /{" "}
             <span className="ml-1 font-medium text-gray-900">{course.title}</span>
           </div>
 
