@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/it-professions/Navbar";
 import Footer from "@/components/it-professions/Footer";
-import api from "@/lib/api"; // axios or fetch wrapper
+import api from "@/lib/api";
 
 interface ICourse {
   title: string;
@@ -19,8 +19,15 @@ interface ICourse {
   lessons?: { title: string }[];
 }
 
-export default function DynamicCoursePage() {
-  const { slug } = useParams();
+interface Props {
+  slug: string;
+}
+
+export default function DynamicCoursePageWrapper({ params }: { params: { slug: string } }) {
+  return <DynamicCoursePage slug={params.slug} />;
+}
+
+function DynamicCoursePage({ slug }: Props) {
   const [course, setCourse] = useState<ICourse | null>(null);
 
   useEffect(() => {
@@ -28,7 +35,10 @@ export default function DynamicCoursePage() {
       api
         .get(`/courses?slug=${slug}`)
         .then(res => setCourse(res.data))
-        .catch(() => setCourse(null));
+        .catch(err => {
+          console.error("Error fetching course:", err);
+          setCourse(null);
+        });
     }
   }, [slug]);
 
@@ -38,12 +48,12 @@ export default function DynamicCoursePage() {
     <>
       <Navbar />
 
-      {/* ========== HERO ========== */}
+      {/* HERO SECTION */}
       <header className="bg-linear-to-br text-black from-blue-50 to-white py-20">
         <div className="max-w-7xl mx-auto px-6 md:px-10">
           <div className="mb-6 text-sm text-gray-600">
-            <Link href="/">Home</Link> / 
-            <Link href="/course/it" className="ml-1">Courses</Link> / 
+            <Link href="/">Home</Link> /{" "}
+            <Link href="/courses/it" className="ml-1">Courses</Link> /{" "}
             <span className="ml-1 font-medium text-gray-900">{course.title}</span>
           </div>
 
@@ -85,7 +95,7 @@ export default function DynamicCoursePage() {
         </div>
       </header>
 
-      {/* ========== LESSONS / SIDEBAR ========== */}
+      {/* LESSONS / SIDEBAR */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10">
           <div className="md:col-span-2">
