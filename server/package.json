@@ -1,15 +1,15 @@
 {
   "name": "mern-backend",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "seed": "ts-node seed.ts",
     "admin": "ts-node admin.ts",
     "ac": "ts-node ac.ts",
-
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "deploy-build": "npm install && tsc"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -22,11 +22,11 @@
     "mongoose": "^7.0.3"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.21",
-    "@types/jsonwebtoken": "^9.0.5",
+    "@types/express": "^4.17.25",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.12.7",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
