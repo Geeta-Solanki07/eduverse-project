@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only index.ts",
     "seed": "ts-node seed.ts",
     "admin": "ts-node admin.ts",
     "ac": "ts-node ac.ts",
