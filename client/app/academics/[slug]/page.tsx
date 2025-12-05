@@ -29,7 +29,7 @@ export default async function AcademicClassPage({
 }: {
   params: { slug: string };
 }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   const API = process.env.NEXT_PUBLIC_API_URL;
 
