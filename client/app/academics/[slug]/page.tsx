@@ -24,14 +24,21 @@ interface AcademicClass {
   subjects?: Subject[];
 }
 
-export default async function AcademicClassPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const { slug } = await params;
+// ✅ CORRECT TYPE for Next.js 14/15
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
+export default async function AcademicClassPage({ params }: PageProps) {
+  const slug = params.slug;
 
   const API = process.env.NEXT_PUBLIC_API_URL;
+
+  if (!slug) {
+    return notFound();
+  }
 
   try {
     const res = await fetch(`${API}/academics/classes/${slug}`, {
@@ -48,6 +55,7 @@ export default async function AcademicClassPage({
       <>
         <Navbar />
 
+        {/* Class Info */}
         <section className="bg-gray-50 py-14">
           <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10">
             <div>
@@ -72,9 +80,10 @@ export default async function AcademicClassPage({
           </div>
         </section>
 
+        {/* Subjects & Chapters */}
         <section className="py-12">
           <div className="max-w-6xl mx-auto px-6 space-y-10">
-            {data.subjects?.length ? (
+            {data.subjects && data.subjects.length > 0 ? (
               data.subjects.map((subject, index) => (
                 <div key={index}>
                   <h2 className="text-xl font-bold text-blue-700 mb-4">
@@ -82,7 +91,7 @@ export default async function AcademicClassPage({
                   </h2>
 
                   <div className="space-y-4">
-                    {subject.chapters?.map((chapter, i) => (
+                    {subject.chapters.map((chapter, i) => (
                       <div
                         key={i}
                         className="border p-4 rounded-lg bg-white shadow-sm"
@@ -119,6 +128,7 @@ export default async function AcademicClassPage({
       </>
     );
   } catch (error) {
+    console.error(error);
     return notFound();
   }
 }
