@@ -24,17 +24,23 @@ export default function LoginPage() {
     try {
       const res = await api.post("/auth/login", form);
 
+      // ✅ Save in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem("name", res.data.user.name);
 
-      setMsg("✅ Login successful...redirecting");
+      // ✅ ALSO save in cookie for middleware
+      document.cookie = `token=${res.data.token}; path=/`;
+
+      setMsg("✅ Login successful...");
 
       setTimeout(() => {
-        if (res.data.user.role === "admin")
-          router.push("/admin/dashboard");
-        else router.push("/user/dashboard");
-      }, 700);
-
+        if (res.data.user.role === "admin") {
+          router.replace("/admin/dashboard");
+        } else {
+          router.replace("/user/dashboard");
+        }
+      }, 500);
     } catch (err: any) {
       setMsg("❌ " + (err?.response?.data?.message || "Invalid credentials"));
     }
@@ -43,24 +49,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex text-black">
-      
-      {/* LEFT IMAGE PANEL */}
-      <div className="hidden md:flex flex-1 bg-indigo-600 text-white items-center justify-center">
-        <div className="text-center">
-          <img src="/assets/login.webp" className="w-80 mx-auto animate-pulse" />
+    <div className="min-h-screen flex flex-col md:flex-row text-black">
+
+      <div className="md:hidden bg-indigo-600 text-white py-10 flex justify-center">
+        <img src="/assets/login.webp" className="w-52" />
+      </div>
+
+      <div className="hidden md:flex w-1/2 bg-indigo-600 text-white items-center justify-center">
+        <div className="text-center px-6">
+          <img src="/assets/login.webp" className="w-80 mx-auto" />
           <h1 className="text-3xl font-semibold mt-6">Welcome Back 👋</h1>
-          <p className="opacity-90 text-sm">Continue your journey with Eduverse</p>
+          <p className="opacity-90 text-sm mt-2">
+            Continue your journey with Eduverse
+          </p>
         </div>
       </div>
 
-      {/* RIGHT FORM */}
-      <div className="flex flex-1 items-center justify-center bg-gray-50">
+      <div className="flex w-full md:w-1/2 items-center justify-center bg-gray-50 px-4 py-10">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md"
+          className="bg-white shadow-xl rounded-xl p-6 sm:p-8 w-full max-w-md"
         >
-          <h2 className="text-3xl font-semibold text-center mb-6">Sign In</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-6">
+            Sign In
+          </h2>
 
           {msg && (
             <p className="mb-4 text-sm p-2 bg-gray-100 rounded text-center">
@@ -74,7 +86,7 @@ export default function LoginPage() {
             required
             value={form.email}
             onChange={handleChange}
-            className="w-full border mb-4 p-3 rounded"
+            className="w-full border mb-4 p-3 rounded text-sm"
             placeholder="Email address"
           />
 
@@ -84,29 +96,16 @@ export default function LoginPage() {
             required
             value={form.password}
             onChange={handleChange}
-            className="w-full border mb-4 p-3 rounded"
+            className="w-full border mb-4 p-3 rounded text-sm"
             placeholder="Password"
           />
 
           <button
             disabled={loading}
-            className="w-full py-2.5 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+            className="w-full py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
           >
             {loading ? "Loading..." : "Sign In"}
           </button>
-
-          <div className="text-center mt-4">
-            <a href="/auth/forgot" className="text-indigo-600">
-              Forgot Password?
-            </a>
-          </div>
-
-          <p className="text-center text-sm mt-4">
-            Don’t have an account?{" "}
-            <a href="/auth/register" className="text-indigo-600 font-medium">
-              Sign up
-            </a>
-          </p>
         </form>
       </div>
     </div>

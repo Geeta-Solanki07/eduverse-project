@@ -6,7 +6,7 @@ interface User {
   _id: string;
   name: string;
   email: string;
-  role: "admin" | "user" | "teacher";
+  role: "admin" | "user"; // Removed "teacher"
   createdAt: string;
 }
 
@@ -50,6 +50,9 @@ export default function UsersPage() {
 
   if (loading) return <p>Loading users...</p>;
 
+  // Today's date
+  const today = new Date().toLocaleDateString();
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Users Management</h1>
@@ -76,11 +79,10 @@ export default function UsersPage() {
                     className="border rounded px-2 py-1"
                   >
                     <option value="user">User</option>
-                    <option value="teacher">Teacher</option>
                     <option value="admin">Admin</option>
                   </select>
                 </td>
-                <td className="p-3 border">{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td className="p-3 border">{today}</td>
                 <td className="p-3 border">
                   <button
                     onClick={() => deleteUser(user._id)}

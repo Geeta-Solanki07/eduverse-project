@@ -1,10 +1,15 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const SubcategorySchema = new Schema({
-  key: { type: String, required: true },
+export interface ISubcategory extends Document {
+  key: string;
+  name: string;
+  categoryKey: string;
+}
+
+const SubcategorySchema = new Schema<ISubcategory>({
+  key: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   categoryKey: { type: String, required: true },
-  slug: { type: String, required: true, unique: true }
 });
 
-export default mongoose.models.Subcategory || mongoose.model("Subcategory", SubcategorySchema);
+export default mongoose.models.Subcategory || mongoose.model<ISubcategory>("Subcategory", SubcategorySchema);

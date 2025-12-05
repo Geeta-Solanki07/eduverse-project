@@ -1,14 +1,13 @@
-import { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
 import Navbar from "@/components/it-professions/Navbar";
 import Footer from "@/components/it-professions/Footer";
-
-/* ---------------- TYPES ---------------- */
-
-type Lesson = {
-  title: string;
-};
+import api from "@/lib/api";
 
 interface ICourse {
   title: string;
@@ -18,150 +17,121 @@ interface ICourse {
   image: string;
   instructor: string;
   level: string;
-  lessons?: Lesson[];
+  lessons?: {
+    title: string;
+    videoUrl?: string;
+    content?: string;
+  }[];
 }
 
-/* ✅ SEO METADATA */
-export const metadata: Metadata = {
-  title: "Course Details | EduVerse",
-  description: "Complete course details on EduVerse platform",
-};
+export default function DynamicCoursePage() {
+  const { slug } = useParams();
 
-/* ---------------- PAGE ---------------- */
+  const [course, setCourse] = useState<ICourse | null>(null);
+  const [activeLesson, setActiveLesson] = useState<number>(0);
 
-export default async function Page({
-  params,
-}: {
-  params: { slug: string };
-}) {
-
-  const { slug } = params;
-  let course: ICourse | null = null;
-
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/courses?slug=${slug}`,
-      { cache: "no-store" }
-    );
-
-    if (!res.ok) throw new Error("Failed to fetch");
-
-    course = await res.json();
-  } catch (error) {
-    console.error("Course fetch error:", error);
-  }
+  useEffect(() => {
+    if (slug) {
+      api.get(`/courses?slug=${slug}`)
+        .then(res => {
+          setCourse(res.data);
+        })
+        .catch(() => setCourse(null));
+    }
+  }, [slug]);
 
   if (!course) {
-    return (
-      <>
-        <Navbar />
-        <p className="text-center py-20 text-xl font-semibold">
-          Course not found
-        </p>
-        <Footer />
-      </>
-    );
+    return <p className="text-center py-20 text-lg">Loading course...</p>;
   }
+
+  const lesson = course.lessons?.[activeLesson];
 
   return (
     <>
       <Navbar />
 
-      <header className="bg-gradient-to-br from-blue-50 to-white py-20">
+      {/* ===== HERO ===== */}
+      <header className="bg-gradient-to-br text-black font-bold from-blue-50 to-white py-20">
         <div className="max-w-7xl mx-auto px-6 md:px-10">
-          <div className="mb-6 text-sm text-gray-600">
+          <div className="text-sm text-gray-600 mb-4">
             <Link href="/">Home</Link> /{" "}
-            <Link href="/course/it">Courses</Link> /{" "}
-            <span className="font-medium text-gray-900">
-              {course.title}
-            </span>
+            <Link href="/courses">Courses</Link> /{" "}
+            <span className="font-semibold">{course.title}</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                {course.title}
-              </h1>
+              <h1 className="text-4xl font-bold mb-4">{course.title}</h1>
+              <p className="text-gray-700 mb-6">{course.summary}</p>
 
-              <p className="text-lg text-gray-700 mb-8">
-                {course.summary}
-              </p>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white p-4 shadow rounded-lg">
-                  <p className="text-sm text-gray-500">Level</p>
-                  <p className="font-semibold text-gray-800">
-                    {course.level}
-                  </p>
-                </div>
-
-                <div className="bg-white p-4 shadow rounded-lg">
-                  <p className="text-sm text-gray-500">Lessons</p>
-                  <p className="font-semibold text-gray-800">
-                    {course.lessons?.length ?? 0}
-                  </p>
-                </div>
-
-                <div className="bg-white p-4 shadow rounded-lg">
-                  <p className="text-sm text-gray-500">Price</p>
-                  <p className="font-semibold text-gray-800">
-                    ₹{course.price}
-                  </p>
-                </div>
+              <div className="flex gap-6 mb-6">
+                <p><strong>Level:</strong> {course.level}</p>
+                <p><strong>Lessons:</strong> {course.lessons?.length || 0}</p>
+                <p><strong>Price:</strong> ₹{course.price}</p>
               </div>
 
-              <button className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition">
+              <button className="bg-orange-500 px-8 py-3 rounded-lg text-white font-semibold hover:bg-orange-600">
                 Enroll Now
               </button>
             </div>
 
-            <div className="flex justify-center">
-              <Image
-                src={course.image || "/placeholder.png"}
-                alt={course.title}
-                width={550}
-                height={400}
-                priority
-                className="rounded-xl shadow-xl object-cover w-full"
-              />
+            <div>
+             <Image
+  src={course.image || "/assets/default.jpg"}
+  alt={course.title || "Course Image"}
+  width={600}
+  height={400}
+  className="rounded-xl shadow-xl"
+/>
+
             </div>
           </div>
         </div>
       </header>
 
-      <section className="py-20 bg-white">
+      {/* ===== MAIN CONTENT ===== */}
+      <section className="py-16 bg-white text-black font-bold">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10">
 
+          {/* ==== Video / Content Area ==== */}
           <div className="md:col-span-2">
-            <h2 className="text-3xl font-bold mb-6">Lessons</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              {lesson?.title || "Select a lesson"}
+            </h2>
 
-            {course.lessons && course.lessons.length > 0 ? (
-              course.lessons.map((lesson, i) => (
-                <div
-                  key={i}
-                  className="p-4 mb-3 bg-gray-50 border rounded-lg"
-                >
-                  {lesson.title}
-                </div>
-              ))
+            {lesson?.videoUrl ? (
+              <iframe
+                src={lesson.videoUrl}
+                className="w-full h-[350px] rounded-lg mb-4"
+                allowFullScreen
+              ></iframe>
             ) : (
-              <p className="text-gray-600">No lessons available</p>
+              <div className="p-6 bg-gray-100 rounded-lg">
+                {lesson?.content || "No content available"}
+              </div>
             )}
           </div>
 
-          <aside>
-            <div className="p-6 bg-white shadow-lg rounded-lg border">
-              <h3 className="text-xl font-semibold mb-4">Course Price</h3>
+          {/* ==== Lessons Sidebar ==== */}
+          <aside className="bg-white shadow-lg rounded-lg p-6 border">
+            <h3 className="text-xl font-semibold mb-4">Lessons</h3>
 
-              <p className="text-3xl font-bold text-orange-500 mb-6">
-                ₹{course.price}
-              </p>
-
-              <button className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition">
-                Enroll Now
-              </button>
-            </div>
+            {course.lessons?.map((lesson, index) => (
+              <div
+                key={index}
+                onClick={() => setActiveLesson(index)}
+                className={`cursor-pointer p-3 mb-2 rounded-md border transition 
+                    ${
+                      index === activeLesson
+                        ? "bg-orange-500 text-white"
+                        : "bg-gray-50 hover:bg-orange-100"
+                    }`}
+              >
+                {lesson.title}
+              </div>
+            ))}
           </aside>
+
         </div>
       </section>
 

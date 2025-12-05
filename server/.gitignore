@@ -1,0 +1,12 @@
+# Environment file (secret)
+.env
+
+# Dependencies
+node_modules
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# Build (if any)
+dist

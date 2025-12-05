@@ -11,7 +11,6 @@
 // export default api;
 
 
-// lib/api.ts
 import axios from "axios";
 
 const api = axios.create({
@@ -19,10 +18,20 @@ const api = axios.create({
     process.env.NODE_ENV === "production"
       ? "https://eduverse-project.onrender.com/api"
       : "http://localhost:5000/api",
-  withCredentials: true,
+  withCredentials: true, // cookies ke liye
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// ✅ Request interceptor to attach token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export default api;
+

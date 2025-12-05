@@ -10,10 +10,15 @@ export default function useAuthRedirect() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    if (token && role) {
-      // 🛡 Block Login/Register when already logged in
-      if (role === "admin") router.replace("/admin/dashboard");
-      else router.replace("/user/dashboard");
+    if (!token || !role) return;
+
+    // ✅ Already logged in user should NOT see login/register
+    if (window.location.pathname.startsWith("/auth")) {
+      if (role === "admin") {
+        router.replace("/admin/dashboard");
+      } else {
+        router.replace("/user/dashboard");
+      }
     }
-  }, []);
+  }, [router]);
 }

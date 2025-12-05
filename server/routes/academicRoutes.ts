@@ -1,26 +1,38 @@
-import express from "express";
+// src/routes/academicRoutes.ts
+import { Router } from "express";
 import AcademicClass from "../models/AcademicClass";
 
-const router = express.Router();
+const router = Router();
 
-/* ✅ GET ALL CLASSES */
-router.get("/classes", async (req, res) => {
-  const classes = await AcademicClass.find();
-  res.json(classes);
+/** GET all classes */
+router.get("/classes", async (_req, res) => {
+  try {
+    const classes = await AcademicClass.find().lean();
+    res.json(classes);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch classes" });
+  }
 });
 
-/* ✅ GET SINGLE CLASS BY SLUG */
+/** GET class by slug */
 router.get("/classes/:slug", async (req, res) => {
-  const cls = await AcademicClass.findOne({ slug: req.params.slug });
-  if (!cls) return res.status(404).json({ message: "Class not found" });
-  res.json(cls);
+  try {
+    const cls = await AcademicClass.findOne({ slug: req.params.slug }).lean();
+    if (!cls) return res.status(404).json({ message: "Class not found" });
+    res.json(cls);
+  } catch {
+    res.status(500).json({ message: "Failed to fetch class" });
+  }
 });
 
-/* ✅ ADD CLASS (ADMIN) */
+/** CREATE class (admin use) */
 router.post("/classes", async (req, res) => {
-  const newClass = new AcademicClass(req.body);
-  await newClass.save();
-  res.json(newClass);
+  try {
+    const newClass = await AcademicClass.create(req.body);
+    res.status(201).json(newClass);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message || "Invalid payload" });
+  }
 });
 
 export default router;

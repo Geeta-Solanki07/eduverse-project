@@ -1,33 +1,25 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IClass extends Document {
   title: string;
   slug: string;
-  category: "elementary" | "junior" | "senior";
+  description?: string;
+  image?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const ClassSchema: Schema = new Schema(
+const classSchema: Schema = new Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-
-    category: {
-      type: String,
-      enum: ["elementary", "junior", "senior"],
-      required: true,
-    },
+    title: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    description: { type: String, default: "" },
+    image: { type: String, default: "" },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export default mongoose.models.Class ||
-  mongoose.model<IClass>("Class", ClassSchema);
+const ClassModel = mongoose.models.Class || mongoose.model<IClass>("Class", classSchema);
+export default ClassModel;

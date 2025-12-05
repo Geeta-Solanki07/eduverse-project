@@ -1,3 +1,4 @@
+// app/auth/register/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -6,7 +7,7 @@ import api from "@/lib/api";
 import useAuthRedirect from "@/app/hooks/useAuthRedirect";
 
 export default function RegisterPage() {
-  useAuthRedirect(); // 🔥 Prevent access when logged in
+  useAuthRedirect(); // Prevent access when already logged in
 
   const router = useRouter();
   const [form, setForm] = useState({
@@ -14,17 +15,16 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "user",
+    role: "user", // 🔒 Fixed role
   });
 
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-
-  const handleChange = (e: any) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
@@ -45,9 +45,7 @@ export default function RegisterPage() {
         setMsg("❌ " + res.data?.message);
       }
     } catch (err: any) {
-      setMsg(
-        "❌ " + (err?.response?.data?.message || "Something went wrong!")
-      );
+      setMsg("❌ " + (err?.response?.data?.message || "Something went wrong!"));
     } finally {
       setLoading(false);
     }
@@ -56,6 +54,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-poppins">
       
+      {/* Left Side Image */}
       <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-gradient-to-br from-indigo-500 to-indigo-700 text-white">
         <img src="/assets/login.webp" className="w-3/4 max-w-md animate-float" />
         <div className="text-center mt-6">
@@ -64,6 +63,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
+      {/* Right Form */}
       <div className="flex flex-1 justify-center items-center bg-gray-50">
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-6">
 
@@ -83,6 +83,7 @@ export default function RegisterPage() {
             </p>
           )}
 
+          {/* Name */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm mb-1">Full Name</label>
             <input
@@ -96,6 +97,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Email */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm mb-1">Email</label>
             <input
@@ -109,6 +111,7 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Password */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm mb-1">Password</label>
             <input
@@ -123,7 +126,8 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="mb-4">
+          {/* Confirm Password */}
+          <div className="mb-6">
             <label className="block text-gray-700 text-sm mb-1">Confirm Password</label>
             <input
               name="confirmPassword"
@@ -135,19 +139,6 @@ export default function RegisterPage() {
               placeholder="Confirm password"
               className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
             />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm mb-1">Role</label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full border text-black border-gray-300 rounded-lg pl-3 py-2.5 focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="user">User</option>
-              <option value="teacher">Teacher</option>
-            </select>
           </div>
 
           <button
