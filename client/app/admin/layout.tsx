@@ -1,18 +1,19 @@
 "use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminTopbar from "@/components/admin/AdminTopbar";
-import { useState } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token || role !== "admin") router.replace("/auth/login");
+  }, []);
   return (
-    <div className="flex h-screen bg-gray-100 text-black">
-      <AdminSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
-      <div className="flex-1 flex flex-col">
-        <AdminTopbar setSidebarOpen={setSidebarOpen} />
-        <main className="p-6 overflow-auto">{children}</main>
-      </div>
+    <div className="flex min-h-screen bg-gray-100">
+      <AdminSidebar />
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }

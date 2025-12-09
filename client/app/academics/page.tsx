@@ -28,14 +28,14 @@ export default function AcademicsPage() {
   useEffect(() => {
     api
       .get("/academics/classes")
-      .then((res) => setClasses(res.data))
+      .then((res) => setClasses(res.data.classes))
       .catch((err) => console.log(err))
       .finally(() => setLoading(false));
   }, []);
 
   const elementary = classes.filter((c) => c.category === "elementary");
   const junior = classes.filter((c) => c.category === "junior");
-  const senior = classes.filter((c) => c.category === "senior"); // 9-12
+  const senior = classes.filter((c) => c.category === "senior");
 
   if (loading)
     return <p className="text-center py-20 text-gray-700">Loading...</p>;
@@ -48,17 +48,17 @@ export default function AcademicsPage() {
       <FeaturesSection />
 
       <CoursesSection
-        sectionTitle="Elementary Class Courses (1st - 5th)"
+        sectionTitle="Elementary Classes (1st - 5th)"
         courses={elementary}
       />
 
       <CoursesSection
-        sectionTitle="Junior Class Courses (6th - 8th)"
+        sectionTitle="Junior Classes (6th - 8th)"
         courses={junior}
       />
 
       <CoursesSection
-        sectionTitle="Senior Class Courses (9th - 12th)"
+        sectionTitle="Senior Classes (9th - 12th)"
         courses={senior}
       />
 

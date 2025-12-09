@@ -1,32 +1,47 @@
 "use client";
-import { useEffect, useState } from "react";
-import api from "@/lib/api";
+import { useState } from "react";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<any>(null);
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
 
-  useEffect(() => {
-    api.get("/admin/stats")
-      .then(res => setStats(res.data))
-      .catch(err => console.error(err));
-  }, []);
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
 
-  if (!stats) return <p>Loading...</p>;
+    await fetch("http://localhost:5000/api/academics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, slug, subjects: [] })
+    });
+
+    alert("Class Added Successfully ✅");
+    setTitle("");
+    setSlug("");
+  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="bg-white shadow p-6 rounded-lg">
-        <h2 className="text-gray-500">Total Users</h2>
-        <p className="text-4xl font-bold">{stats.users}</p>
-      </div>
-      <div className="bg-white shadow p-6 rounded-lg">
-        <h2 className="text-gray-500">Total Courses</h2>
-        <p className="text-4xl font-bold">{stats.courses}</p>
-      </div>
-      <div className="bg-white shadow p-6 rounded-lg">
-        <h2 className="text-gray-500">Revenue</h2>
-        <p className="text-4xl font-bold">₹ {stats.revenue}</p>
-      </div>
+    <div className="p-10">
+      <h1 className="text-2xl font-bold mb-5">Add Academic Class</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <input
+          className="border p-2 w-full"
+          placeholder="Class Name"
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+        />
+
+        <input
+          className="border p-2 w-full"
+          placeholder="Slug (eg: class-10)"
+          value={slug}
+          onChange={e => setSlug(e.target.value)}
+        />
+
+        <button className="bg-black text-white px-5 py-2">
+          Add Class
+        </button>
+      </form>
     </div>
   );
 }

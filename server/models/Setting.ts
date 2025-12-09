@@ -1,12 +1,17 @@
-// server/models/Subject.ts
-import mongoose from "mongoose";
+// server/models/Settings.ts
+import { Schema, model, Document } from "mongoose";
 
-const SubjectSchema = new mongoose.Schema({
-  title: { type: String, required: true },      // English, Maths, Science
-  slug: { type: String, required: true },
-  classSlug: { type: String, required: true },   // e.g. class-5
-  image: String
-}, { timestamps: true });
+export interface ISettings extends Document {
+  siteName: string;
+  theme: "light" | "dark";
+}
 
-export default mongoose.models.Subject
-  || mongoose.model("Subject", SubjectSchema);
+const SettingsSchema = new Schema<ISettings>(
+  {
+    siteName: { type: String, required: true, default: "Eduverse" },
+    theme: { type: String, enum: ["light", "dark"], default: "light" },
+  },
+  { timestamps: true }
+);
+
+export default model<ISettings>("Settings", SettingsSchema);

@@ -1,13 +1,22 @@
 // server/models/Subject.ts
+import mongoose, { Schema, Document } from "mongoose";
 
-import mongoose from "mongoose";
+export interface ISubject extends Document {
+  title: string;
+  slug: string;
+  classId: mongoose.Types.ObjectId;
+  description?: string;
+}
 
-const SubjectSchema = new mongoose.Schema({
-  title: String,           // Maths
-  slug: String,            // maths
-  image: String,
-  classSlug: String,        // "class-6"
-  language: String,         // english / hindi
-});
+const SubjectSchema = new Schema(
+  {
+    title: { type: String, required: true },
+    slug: { type: String, required: true },
+    classId: { type: Schema.Types.ObjectId, ref: "AcademicClass", required: true },
+    description: String,
+  },
+  { timestamps: true }
+);
 
-export default mongoose.model("Subject", SubjectSchema);
+export default mongoose.models.Subject ||
+  mongoose.model<ISubject>("Subject", SubjectSchema);

@@ -1,18 +1,38 @@
+// server/controllers/subcategoryController.ts
 import { Request, Response } from "express";
 import Subcategory from "../models/Subcategory";
 import Course from "../models/Course";
 
 export const getSubcategories = async (req: Request, res: Response) => {
-  const { categoryKey } = req.query;
-  if (!categoryKey) return res.status(400).json({ message: "categoryKey required" });
-  const subs = await Subcategory.find({ categoryKey }).lean();
-  res.json(subs);
+  try {
+    const { categoryKey } = req.query;
+
+    const filter = categoryKey ? { categoryKey } : {};
+    const subs = await Subcategory.find(filter);
+
+    res.json({ success: true, data: subs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
 export const getSubWithCourses = async (req: Request, res: Response) => {
-  const key = req.params.key;
-  const sub = await Subcategory.findOne({ key }).lean();
-  if (!sub) return res.status(404).json({ message: "Not found" });
-  const courses = await Course.find({ subcategoryKey: key }).lean();
-  res.json({ sub, courses });
+  try {
+    const { key } = req.params;
+
+    const sub = await Subcategory.findOne({ key });
+    if (!sub) {
+      return res.status(404).json({ success: false, message: "Subcategory not found" });
+    }
+
+    const courses = await Course.find({ subcategoryKey: key });
+
+    res.json({
+      success: true,
+      subcategory: sub,
+      courses,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };

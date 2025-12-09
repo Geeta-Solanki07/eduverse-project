@@ -1,46 +1,63 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Home, Users, BookOpen, ListChecks, ChartBar } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-interface SidebarProps {
-  open: boolean;
-  setOpen: (v: boolean) => void;
-}
+export default function AdminSidebar() {
+  const router = useRouter();
 
-export default function AdminSidebar({ open, setOpen }: SidebarProps) {
-  const pathname = usePathname();
-
-  const links = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: <Home size={20} /> },
-    { name: "Users", href: "/admin/users", icon: <Users size={20} /> },
-    { name: "Courses", href: "/admin/courses", icon: <BookOpen size={20} /> },
-    { name: "Categories", href: "/admin/categories", icon: <ListChecks size={20} /> },
-    { name: "Orders", href: "/admin/orders", icon: <ChartBar size={20} /> },
-  ];
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken"); // admin logout
+    alert("Logged Out Successfully");
+    router.push("/auth/login");
+  };
 
   return (
-    <div className={`bg-white shadow-lg h-full transition-all ${open ? "w-64" : "w-16"} overflow-hidden`}>
-      <div className="flex items-center justify-between p-4">
-        <span className={`text-xl font-bold ${!open && "hidden"}`}>Eduverse</span>
-        <button onClick={() => setOpen(!open)} className="p-1 rounded hover:bg-gray-200">
-          {open ? "<" : ">"}
-        </button>
+    <aside className="w-64 h-screen bg-white shadow-lg p-5 flex flex-col justify-between">
+      
+      {/* TOP MENU */}
+      <div>
+        <h2 className="text-xl font-bold text-orange-600 mb-6">Admin Panel</h2>
+
+        <ul className="space-y-3 text-gray-700 font-medium">
+          <li>
+            <Link href="/admin/dashboard" className="block p-2 hover:bg-gray-100 rounded">
+              Dashboard
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/admin/courses" className="block p-2 hover:bg-gray-100 rounded">
+              Add Course
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/admin/classes" className="block p-2 hover:bg-gray-100 rounded">
+              Classes
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/admin/subjects" className="block p-2 hover:bg-gray-100 rounded">
+              Subjects
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/admin/chapters" className="block p-2 hover:bg-gray-100 rounded">
+              Chapters
+            </Link>
+          </li>
+        </ul>
       </div>
-      <nav className="mt-6 flex flex-col gap-1">
-        {links.map((link) => (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={`flex items-center gap-3 p-3 rounded hover:bg-gray-100 transition-all ${
-              pathname.startsWith(link.href) ? "bg-indigo-100 text-indigo-700 font-semibold" : "text-gray-700"
-            }`}
-          >
-            {link.icon}
-            <span className={`${!open && "hidden"} transition-all`}>{link.name}</span>
-          </Link>
-        ))}
-      </nav>
-    </div>
+
+      {/* LOGOUT BUTTON BOTTOM FIXED */}
+      <button
+        onClick={handleLogout}
+        className="bg-red-600 text-white w-full py-2 rounded-lg hover:bg-red-700 transition"
+      >
+        Logout
+      </button>
+    </aside>
   );
 }

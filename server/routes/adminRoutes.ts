@@ -1,14 +1,33 @@
+// server/routes/adminRoutes.ts
 import express from "express";
-import { getAllUsers, updateUserRole, deleteUser } from "../controllers/userController";
-import { protect, adminOnly } from "../middleware/auth";
+import { protect, isAdmin } from "../middleware/auth";
+import * as ctrl from "../controllers/adminController";
 
 const router = express.Router();
 
-// All routes protected & admin-only
-router.use(protect, adminOnly);
+// USERS
+router.get("/users", protect, isAdmin, ctrl.listUsers);
+router.put("/users/:id/role", protect, isAdmin, ctrl.changeUserRole);
+router.delete("/users/:id", protect, isAdmin, ctrl.deleteUser);
 
-router.get("/users", getAllUsers);
-router.put("/users/:id/role", updateUserRole);
-router.delete("/users/:id", deleteUser);
+// CLASSES
+router.get("/classes", protect, isAdmin, ctrl.listClasses);
+router.post("/classes", protect, isAdmin, ctrl.createClass);
+router.delete("/classes/:id", protect, isAdmin, ctrl.deleteClass);
+
+// SUBJECTS
+router.get("/subjects", protect, isAdmin, ctrl.listSubjectsByClass);
+router.post("/subjects", protect, isAdmin, ctrl.createSubject);
+router.delete("/subjects/:id", protect, isAdmin, ctrl.deleteSubject);
+
+// CHAPTERS
+router.get("/chapters", protect, isAdmin, ctrl.listChaptersBySubject);
+router.post("/chapters", protect, isAdmin, ctrl.createChapter);
+router.delete("/chapters/:id", protect, isAdmin, ctrl.deleteChapter);
+
+// IT COURSES
+router.get("/it-courses", protect, isAdmin, ctrl.listITCourses);
+router.post("/it-courses", protect, isAdmin, ctrl.createITCourse);
+router.delete("/it-courses/:id", protect, isAdmin, ctrl.deleteITCourse);
 
 export default router;

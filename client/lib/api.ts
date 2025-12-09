@@ -24,14 +24,35 @@ const api = axios.create({
   },
 });
 
-// ✅ Request interceptor to attach token
+// Attach Authorization header from localStorage token (if present)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const token = (typeof window !== "undefined") ? localStorage.getItem("token") : null;
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (err) {
+    // ignore in SSR
   }
   return config;
-});
+}, (error) => Promise.reject(error));
+
+// Optional: handle auth errors globally
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    // if 401 unauthenticated, you may auto-logout or route to login
+    if (err?.response?.status === 401) {
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("name");
+        }
+      } catch (e) {}
+    }
+    return Promise.reject(err);
+  }
+);
 
 export default api;
-

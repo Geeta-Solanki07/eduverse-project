@@ -1,127 +1,224 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-interface Category {
-  _id: string;
-  name: string;
-  key: string;
-}
+type AcademicClass = { _id: string; title: string; slug: string; category: string };
+type Subject = { _id: string; title: string; slug: string; classId: string };
 
-interface Subcategory {
-  _id: string;
-  name: string;
-  key: string;
-  categoryKey: string;
-}
+export default function AdminCoursesPage() {
+  const [type, setType] = useState<"" | "it" | "academics">("");
+  const [level, setLevel] = useState<"Beginner" | "Intermediate" | "Advanced">(
+    "Beginner"
+  );
 
-interface Lesson {
-  _id?: string;
-  title: string;
-  videoUrl?: string;
-}
+  // IT Fields
+  const [itTitle, setItTitle] = useState("");
+  const [itSlug, setItSlug] = useState("");
+  const [itDesc, setItDesc] = useState("");
 
-interface Course {
-  _id: string;
-  title: string;
-  slug: string;
-  summary: string;
-  price: number;
-  image?: string;
-  instructor: string;
-  categoryKey: string;
-  subcategoryKey: string;
-  level: string;
-  lessons: Lesson[];
-}
+  // Academics Fields
+  const [classes, setClasses] = useState<AcademicClass[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [chapterTitle, setChapterTitle] = useState("");
+  const [chapterSlug, setChapterSlug] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
 
-export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchCourses = async () => {
-    try {
-      const catRes = await api.get("/admin/categories");
-      setCategories(catRes.data.categories);
-
-      const subRes = await api.get("/admin/subcategories");
-      setSubcategories(subRes.data.subcategories);
-
-      const courseRes = await api.get("/admin/courses");
-      setCourses(courseRes.data.courses);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const router = useRouter();
 
   useEffect(() => {
-    fetchCourses();
+    api
+      .get("/academics/classes")
+      .then((res) => setClasses(res.data.classes || res.data))
+      .catch(() => setClasses([]));
   }, []);
 
-  const deleteCourse = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this course?")) return;
-    try {
-      await api.delete(`/admin/courses/${id}`);
-      fetchCourses();
-    } catch (err) {
-      console.error(err);
-    }
+  useEffect(() => {
+    if (!selectedClass) return setSubjects([]);
+
+    api
+      .get(`/admin/subjects?classId=${selectedClass}`)
+      .then((res) => setSubjects(res.data || []))
+      .catch(() => setSubjects([]));
+  }, [selectedClass]);
+
+  const handleAddIT = async (e: any) => {
+    e.preventDefault();
+    await api.post("/admin/it-courses", {
+      title: itTitle,
+      slug: itSlug,
+      level,
+      description: itDesc,
+    });
+    alert("IT Course Added Successfully ⭐");
+    setItTitle("");
+    setItSlug("");
+    setItDesc("");
+    router.refresh();
   };
 
-  if (loading) return <p>Loading courses...</p>;
+  const handleAddChapter = async (e: any) => {
+    e.preventDefault();
+    await api.post("/admin/chapters", {
+      title: chapterTitle,
+      slug: chapterSlug,
+      subjectId: selectedSubject,
+      videoUrl,
+      notesUrl: "",
+    });
+
+    alert("Chapter Added Successfully ⭐");
+    setChapterTitle("");
+    setChapterSlug("");
+    setVideoUrl("");
+  };
 
   return (
-    <div className="text-black">
-      <h1 className="text-2xl font-bold mb-4">Courses Management</h1>
-      <div className="overflow-x-auto">
-        <table className="w-full border text-left">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-3 border">Title</th>
-              <th className="p-3 border">Category</th>
-              <th className="p-3 border">Subcategory</th>
-              <th className="p-3 border">Level</th>
-              <th className="p-3 border">Price</th>
-              <th className="p-3 border">Instructor</th>
-              <th className="p-3 border">Lessons</th>
-              <th className="p-3 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.map((course) => (
-              <tr key={course._id} className="hover:bg-gray-50">
-                <td className="p-3 border">{course.title}</td>
-                <td className="p-3 border">{categories.find(c => c.key === course.categoryKey)?.name}</td>
-                <td className="p-3 border">{subcategories.find(s => s.key === course.subcategoryKey)?.name}</td>
-                <td className="p-3 border">{course.level}</td>
-                <td className="p-3 border">{course.price}</td>
-                <td className="p-3 border">{course.instructor}</td>
-                <td className="p-3 border">
-                  {course.lessons.map((lesson, idx) => (
-                    <p key={idx}>{lesson.title}</p>
-                  ))}
-                </td>
-                <td className="p-3 border flex gap-2">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteCourse(course._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="max-w-4xl mx-auto space-y-8 px-2">
+      <h1 className="text-3xl font-bold text-gray-800">Course Management</h1>
+      <p className="text-gray-600 -mt-3">
+        Add new IT Courses or add Chapters to Academic Subjects.
+      </p>
+
+      {/* SELECT TYPE CARD */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <label className="block mb-2 font-semibold text-gray-700">
+          Select Adding Type
+        </label>
+
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as any)}
+          className="border p-3 rounded-lg w-full bg-gray-50 focus:ring focus:ring-orange-300"
+        >
+          <option value="">Choose an option</option>
+          <option value="it">➤ IT Course</option>
+          <option value="academics">➤ Academics (Add Chapter)</option>
+        </select>
       </div>
+
+      {/* ---------------- IT COURSES FORM ---------------- */}
+      {type === "it" && (
+        <form
+          onSubmit={handleAddIT}
+          className="bg-white p-6 rounded-xl shadow-sm border space-y-5"
+        >
+          <h2 className="text-xl font-semibold text-orange-600 mb-3">
+            Add New IT Course
+          </h2>
+
+          <div>
+            <label className="font-medium">Select Level</label>
+            <select
+              value={level}
+              onChange={(e) => setLevel(e.target.value as any)}
+              className="border p-3 rounded-lg w-full bg-gray-50 focus:ring focus:ring-orange-300"
+            >
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+
+          <input
+            required
+            placeholder="Course Title"
+            value={itTitle}
+            onChange={(e) => setItTitle(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-gray-50 focus:ring focus:ring-orange-300"
+          />
+
+          <input
+            required
+            placeholder="Slug (e.g. react-basics)"
+            value={itSlug}
+            onChange={(e) => setItSlug(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-gray-50 focus:ring focus:ring-orange-300"
+          />
+
+          <textarea
+            placeholder="Description"
+            value={itDesc}
+            onChange={(e) => setItDesc(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-gray-50 focus:ring focus:ring-orange-300"
+          />
+
+          <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg w-full transition">
+            Add IT Course
+          </button>
+        </form>
+      )}
+
+      {/* ---------------- ACADEMICS FORM ---------------- */}
+      {type === "academics" && (
+        <div className="bg-white p-6 rounded-xl shadow-sm border space-y-6">
+          <h2 className="text-xl font-semibold text-blue-600">
+            Add Chapter to Subject
+          </h2>
+
+          <div>
+            <label className="font-medium">Select Class</label>
+            <select
+              className="border p-3 w-full rounded-lg bg-gray-50 focus:ring focus:ring-blue-300"
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+            >
+              <option value="">Choose a class</option>
+              {classes.map((c) => (
+                <option key={c._id} value={c._id}>
+                  {c.title} — {c.category}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="font-medium">Select Subject</label>
+            <select
+              className="border p-3 w-full rounded-lg bg-gray-50 focus:ring focus:ring-blue-300"
+              value={selectedSubject}
+              onChange={(e) => setSelectedSubject(e.target.value)}
+            >
+              <option value="">Choose a subject</option>
+              {subjects.map((s) => (
+                <option key={s._id} value={s._id}>
+                  {s.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <input
+            placeholder="Chapter Title"
+            value={chapterTitle}
+            onChange={(e) => setChapterTitle(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-gray-50 focus:ring focus:ring-blue-300"
+          />
+
+          <input
+            placeholder="Chapter Slug"
+            value={chapterSlug}
+            onChange={(e) => setChapterSlug(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-gray-50 focus:ring focus:ring-blue-300"
+          />
+
+          <input
+            placeholder="Video URL (optional)"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            className="w-full p-3 border rounded-lg bg-gray-50 focus:ring focus:ring-blue-300"
+          />
+
+          <button
+            onClick={handleAddChapter}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg w-full transition"
+          >
+            Add Chapter
+          </button>
+        </div>
+      )}
     </div>
   );
 }

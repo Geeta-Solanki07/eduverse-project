@@ -1,43 +1,17 @@
-// server/controllers/authController.ts
 import { Request, Response } from "express";
 import User from "../models/User";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Send token helper
-const sendToken = (user: any, res: Response) => {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
-    expiresIn: "7d",
-  });
-
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: false,
-  });
-
-  return res.json({
-    success: true,
-    token,
-    user: { id: user._id, name: user.name, email: user.email, role: user.role },
-  });
-};
+const signToken = (id: string) => jwt.sign({ id }, process.env.JWT_SECRET || "secret", { expiresIn: "7d" });
 
 export const register = async (req: Request, res: Response) => {
   try {
-    let { name, email, password } = req.body;
-
-    // Force role to "user" regardless of input
-    const role = "user";
-
-    const exist = await User.findOne({ email });
-    if (exist) return res.status(400).json({ message: "Email already registered" });
-
-    const user = await User.create({ name, email, password, role });
-
-    return res.json({ success: true, message: "Account created" });
+    const { name, email, password } = req.body;
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: "Email already registered" });
+    const u = await User.create({ name, email, password, role: "user" });
+    return res.json({ success: true });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -45,27 +19,19 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password)
-      return res.status(400).json({ message: "All fields required" });
-
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(400).json({ message: "Invalid credentials" });
-
-    const match = await user.comparePassword(password);
-
-    if (!match)
-      return res.status(400).json({ message: "Invalid credentials" });
-
-    return sendToken(user, res);
+    const u: any = await User.findOne({ email });
+    if (!u) return res.status(400).json({ message: "Invalid credentials" });
+    const match = await u.comparePassword(password);
+    if (!match) return res.status(400).json({ message: "Invalid credentials" });
+    const token = signToken(u._id.toString());
+    res.cookie("token", token, { httpOnly: true, sameSite: "lax", secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    return res.json({ token, user: { id: u._id, name: u.name, email: u.email, role: u.role } });
   } catch (err) {
-    console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
 export const logout = (req: Request, res: Response) => {
   res.clearCookie("token");
-  return res.json({ success: true, message: "Logged out successfully" });
+  return res.json({ success: true });
 };

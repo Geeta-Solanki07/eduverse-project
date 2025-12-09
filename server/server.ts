@@ -1,29 +1,33 @@
+// server/server.ts
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-
-import adminRoutes from "./routes/adminRoutes";
+import path from "path";
 
 import authRoutes from "./routes/authRoutes";
-import courseRoutes from "./routes/courseRoutes";
-import categoryRoutes from "./routes/categoryRoutes";
-import subcategoryRoutes from "./routes/subcategoryRoutes";
+import adminRoutes from "./routes/adminRoutes";
 import academicRoutes from "./routes/academicRoutes";
-import syllabusRoute from "./routes/syllabus";
+import itCourseRoutes from "./routes/itCourses";
+import userRoutes from "./routes/userRoutes";
+import settingsRoutes from "./routes/settingsRoutes";
+import analyticsRoutes from "./routes/analyticsRoutes";
 
 dotenv.config();
+
 const app = express();
 
-// Middlewares
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS FIX for Next.js + Cookies
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://eduverse-project.vercel.app"],
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3000",
+      "https://eduverse-project.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -33,27 +37,25 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Eduverse Backend is Running ✔");
 });
 
-// Routes
+// API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/subcategories", subcategoryRoutes);
-app.use("/api/academics", academicRoutes);
-app.use("/api/syllabus", syllabusRoute);
 app.use("/api/admin", adminRoutes);
+app.use("/api/academics", academicRoutes);
+app.use("/api/it-courses", itCourseRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/admin/settings", settingsRoutes);
+app.use("/api/admin/analytics", analyticsRoutes);
 
-
-
-
-// PORT
+// Mongo + Server
 const PORT = process.env.PORT || 5000;
 
-// MongoDB + Server Start
 mongoose
   .connect(process.env.MONGO_URI as string)
   .then(() => {
     console.log("✔ MongoDB Connected");
-    app.listen(PORT, () => console.log(`✔ Server running at ${PORT}`));
+    app.listen(PORT, () =>
+      console.log(`✔ Server running at http://localhost:${PORT}`)
+    );
   })
   .catch((err: any) => {
     console.error("❌ MongoDB Error:", err);

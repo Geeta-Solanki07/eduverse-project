@@ -1,45 +1,44 @@
 // server/controllers/userController.ts
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthRequest } from "../middleware/auth";
+import bcrypt from "bcryptjs";
 import User from "../models/User";
 
-// Get all users
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getMe = async (req: AuthRequest, res: Response) => {
+  if (!req.user) return res.status(401).json({ message: "Not authorized" });
+  res.json({ user: req.user });
+};
+
+export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 });
-    res.json({ users });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    const { name, email } = req.body;
+    if (!req.user) return res.status(401).json({ message: "Not authorized" });
+
+    req.user.name = name || req.user.name;
+    req.user.email = email || req.user.email;
+    await req.user.save();
+
+    res.json({ user: req.user, message: "Profile updated" });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Server error" });
   }
 };
 
-// Update user role
-export const updateUserRole = async (req: Request, res: Response) => {
+export const changePassword = async (req: AuthRequest, res: Response) => {
   try {
-    const { role } = req.body;
-    if (!["user", "teacher", "admin"].includes(role)) {
-      return res.status(400).json({ message: "Invalid role" });
-    }
+    const { currentPassword, newPassword } = req.body;
+    if (!req.user) return res.status(401).json({ message: "Not authorized" });
 
-    const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const match = await req.user.comparePassword(currentPassword);
+    if (!match)
+      return res.status(400).json({ message: "Current password incorrect" });
 
-    res.json({ success: true, user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+    const salt = await bcrypt.genSalt(10);
+    req.user.password = await bcrypt.hash(newPassword, salt);
+    await req.user.save();
 
-// Delete user
-export const deleteUser = async (req: Request, res: Response) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.json({ success: true, message: "User deleted" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.json({ message: "Password changed" });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message || "Server error" });
   }
 };
