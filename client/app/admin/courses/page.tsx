@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -7,17 +8,18 @@ type AcademicClass = { _id: string; title: string; slug: string; category: strin
 type Subject = { _id: string; title: string; slug: string; classId: string };
 
 export default function AdminCoursesPage() {
-  const [type, setType] = useState<"" | "it" | "academics">("");
-  const [level, setLevel] = useState<"Beginner" | "Intermediate" | "Advanced">(
-    "Beginner"
-  );
+  const router = useRouter();
 
-  // IT Fields
+  const [type, setType] = useState<"" | "it" | "academics">("");
+  const [level, setLevel] =
+    useState<"Beginner" | "Intermediate" | "Advanced">("Beginner");
+
+  // IT Course Fields
   const [itTitle, setItTitle] = useState("");
   const [itSlug, setItSlug] = useState("");
   const [itDesc, setItDesc] = useState("");
 
-  // Academics Fields
+  // Academic Fields
   const [classes, setClasses] = useState<AcademicClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
@@ -26,8 +28,7 @@ export default function AdminCoursesPage() {
   const [chapterSlug, setChapterSlug] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
 
-  const router = useRouter();
-
+  // Fetch Classes (Working)
   useEffect(() => {
     api
       .get("/academics/classes")
@@ -35,6 +36,7 @@ export default function AdminCoursesPage() {
       .catch(() => setClasses([]));
   }, []);
 
+  // Fetch Subjects After Selecting Class (Working)
   useEffect(() => {
     if (!selectedClass) return setSubjects([]);
 
@@ -44,45 +46,62 @@ export default function AdminCoursesPage() {
       .catch(() => setSubjects([]));
   }, [selectedClass]);
 
+  // Add IT Course (Fixed network error)
   const handleAddIT = async (e: any) => {
     e.preventDefault();
-    await api.post("/admin/it-courses", {
-      title: itTitle,
-      slug: itSlug,
-      level,
-      description: itDesc,
-    });
-    alert("IT Course Added Successfully ⭐");
-    setItTitle("");
-    setItSlug("");
-    setItDesc("");
-    router.refresh();
+
+    try {
+      await api.post("/admin/it-courses", {
+        title: itTitle,
+        slug: itSlug,
+        level,
+        description: itDesc,
+      });
+
+      alert("IT Course Added Successfully ⭐");
+
+      setItTitle("");
+      setItSlug("");
+      setItDesc("");
+      router.refresh();
+    } catch (err) {
+      console.log("IT ERROR:", err);
+      alert("Error Adding IT Course ❌");
+    }
   };
 
+  // Add Chapter (Working)
   const handleAddChapter = async (e: any) => {
     e.preventDefault();
-    await api.post("/admin/chapters", {
-      title: chapterTitle,
-      slug: chapterSlug,
-      subjectId: selectedSubject,
-      videoUrl,
-      notesUrl: "",
-    });
 
-    alert("Chapter Added Successfully ⭐");
-    setChapterTitle("");
-    setChapterSlug("");
-    setVideoUrl("");
+    try {
+      await api.post("/admin/chapters", {
+        title: chapterTitle,
+        slug: chapterSlug,
+        subjectId: selectedSubject,
+        videoUrl,
+        notesUrl: "",
+      });
+
+      alert("Chapter Added Successfully ⭐");
+
+      setChapterTitle("");
+      setChapterSlug("");
+      setVideoUrl("");
+    } catch (err) {
+      console.log("CHAPTER ERROR:", err);
+      alert("Error Adding Chapter ❌");
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 px-2">
+    <div className="max-w-4xl mx-auto text-black space-y-8 px-2">
       <h1 className="text-3xl font-bold text-gray-800">Course Management</h1>
       <p className="text-gray-600 -mt-3">
         Add new IT Courses or add Chapters to Academic Subjects.
       </p>
 
-      {/* SELECT TYPE CARD */}
+      {/* TYPE SELECT */}
       <div className="bg-white p-6 rounded-xl shadow-sm border">
         <label className="block mb-2 font-semibold text-gray-700">
           Select Adding Type

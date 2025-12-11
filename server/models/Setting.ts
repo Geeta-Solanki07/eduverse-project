@@ -1,4 +1,3 @@
-// server/models/Settings.ts
 import { Schema, model, Document } from "mongoose";
 
 export interface ISettings extends Document {

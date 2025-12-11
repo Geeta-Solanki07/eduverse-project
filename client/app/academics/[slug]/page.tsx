@@ -34,7 +34,7 @@ export default function AcademicClassPage(){
   return (
     <>
       <Navbar />
-      <section className="p-8">
+      <section className="p-8 text-black" >
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-6">
           <div>
             <h1 className="text-4xl font-bold">{data.title}</h1>
@@ -47,7 +47,7 @@ export default function AcademicClassPage(){
         </div>
       </section>
 
-      <section className="p-8">
+      <section className="p-8 text-black">
         <div className="max-w-6xl mx-auto space-y-6">
           {data.subjects?.length ? data.subjects.map((s:any, idx:number) => (
             <div key={idx} className="border rounded p-4">

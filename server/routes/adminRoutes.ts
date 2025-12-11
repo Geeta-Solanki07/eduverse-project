@@ -30,4 +30,8 @@ router.get("/it-courses", protect, isAdmin, ctrl.listITCourses);
 router.post("/it-courses", protect, isAdmin, ctrl.createITCourse);
 router.delete("/it-courses/:id", protect, isAdmin, ctrl.deleteITCourse);
 
+// SETTINGS
+router.get("/settings", protect, isAdmin, ctrl.getSettings);
+router.put("/settings", protect, isAdmin, ctrl.updateSettings);
+
 export default router;

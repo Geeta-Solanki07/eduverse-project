@@ -1,11 +1,13 @@
-// server/routes/settingsRoutes.ts
 import express from "express";
-import * as ctrl from "../controllers/settingsController";
 import { protect, isAdmin } from "../middleware/auth";
+import { getSettings, updateSettings } from "../controllers/settingsController";
 
 const router = express.Router();
 
-router.get("/", protect, isAdmin, ctrl.getSettings);
-router.put("/", protect, isAdmin, ctrl.updateSettings);
+// GET /api/admin/settings
+router.get("/settings", protect, isAdmin, getSettings);
+
+// PUT /api/admin/settings
+router.put("/settings", protect, isAdmin, updateSettings);
 
 export default router;

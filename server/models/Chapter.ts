@@ -1,4 +1,3 @@
-// server/models/Chapter.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IChapter extends Document {
@@ -7,20 +6,23 @@ export interface IChapter extends Document {
   subjectId: mongoose.Types.ObjectId;
   videoUrl?: string;
   notesUrl?: string;
-  order?: number;
+  notes?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const ChapterSchema = new Schema(
+const ChapterSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     slug: { type: String, required: true },
     subjectId: { type: Schema.Types.ObjectId, ref: "Subject", required: true },
-    videoUrl: String,
-    notesUrl: String,
-    order: Number,
+    videoUrl: { type: String },
+    notesUrl: { type: String },
+    notes: { type: String },
   },
   { timestamps: true }
 );
 
-export default mongoose.models.Chapter ||
-  mongoose.model<IChapter>("Chapter", ChapterSchema);
+ChapterSchema.index({ subjectId: 1, slug: 1 });
+
+export default mongoose.models.Chapter || mongoose.model<IChapter>("Chapter", ChapterSchema);

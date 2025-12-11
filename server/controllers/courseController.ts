@@ -1,36 +1,28 @@
 import { Request, Response } from "express";
-import Course from "../models/Course";
+import ITCourse from "../models/ITCourse";
 
-export const getCourses = async (req: Request, res: Response) => {
-  const { categoryKey, subcategoryKey } = req.query;
-  const q: any = {};
-  if (categoryKey) q.categoryKey = categoryKey;
-  if (subcategoryKey) q.subcategoryKey = subcategoryKey;
-  const courses = await Course.find(q).lean();
-  res.json(courses);
+export const listCourses = async (req: Request, res: Response) => {
+  const courses = await ITCourse.find().sort({ createdAt: -1 });
+  res.json({ courses });
 };
 
-export const getCourse = async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  const course = await Course.findOne({ slug }).lean();
+export const getCourseBySlug = async (req: Request, res: Response) => {
+  const course = await ITCourse.findOne({ slug: req.params.slug });
   if (!course) return res.status(404).json({ message: "Course not found" });
-  res.json(course);
+  res.json({ course });
 };
 
 export const createCourse = async (req: Request, res: Response) => {
-  const body = req.body;
-  const newCourse = await Course.create(body);
-  res.status(201).json(newCourse);
+  const course = await ITCourse.create(req.body);
+  res.status(201).json({ course });
 };
 
 export const updateCourse = async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  const updated = await Course.findOneAndUpdate({ slug }, req.body, { new: true });
-  res.json(updated);
+  const updated = await ITCourse.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json({ course: updated });
 };
 
 export const deleteCourse = async (req: Request, res: Response) => {
-  const slug = req.params.slug;
-  await Course.findOneAndDelete({ slug });
+  await ITCourse.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });
 };

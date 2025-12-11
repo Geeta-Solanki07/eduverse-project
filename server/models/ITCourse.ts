@@ -1,5 +1,4 @@
-// server/models/ITCourse.ts
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IITCourse extends Document {
   title: string;
@@ -8,22 +7,17 @@ export interface IITCourse extends Document {
   description?: string;
   price?: number;
   image?: string;
+  enrolledCount?: number;
 }
 
-const ITCourseSchema = new Schema<IITCourse>(
-  {
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    level: {
-      type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
-      required: true,
-    },
-    description: String,
-    price: Number,
-    image: String,
-  },
-  { timestamps: true }
-);
+const schema = new Schema<IITCourse>({
+  title: { type: String, required: true },
+  slug: { type: String, required: true, unique: true },
+  level: { type: String, enum: ["Beginner","Intermediate","Advanced"], default: "Beginner" },
+  description: String,
+  price: { type: Number, default: 0 },
+  image: String,
+  enrolledCount: { type: Number, default: 0 }
+}, { timestamps: true });
 
-export default model<IITCourse>("ITCourse", ITCourseSchema);
+export default mongoose.models.ITCourse || mongoose.model<IITCourse>("ITCourse", schema);

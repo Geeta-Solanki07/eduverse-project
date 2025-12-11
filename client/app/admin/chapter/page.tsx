@@ -22,7 +22,7 @@ export default function AdminChapters() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto text-black">
       <h2 className="text-2xl font-bold mb-4">Add Chapter</h2>
       <form onSubmit={submit} className="bg-white p-4 rounded shadow space-y-3">
         <select required value={subjectId} onChange={e=>setSubjectId(e.target.value)} className="w-full p-2 border rounded">

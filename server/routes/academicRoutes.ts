@@ -1,4 +1,3 @@
-// server/routes/academicRoutes.ts
 import express from "express";
 import * as ctrl from "../controllers/academicController";
 

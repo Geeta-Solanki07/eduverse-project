@@ -11,7 +11,7 @@ interface ITCourse {
   _id: string;
   title: string;
   slug: string;
-  category: "Beginner" | "Intermediate" | "Advanced";
+  level: "Beginner" | "Intermediate" | "Advanced";
 }
 
 export default function ITNavbar() {
@@ -19,16 +19,19 @@ export default function ITNavbar() {
   const [courses, setCourses] = useState<ITCourse[]>([]);
   const router = useRouter();
 
+  // Fetch IT courses
   useEffect(() => {
-    api.get("/it-courses")
-      .then(res => setCourses(res.data))
+    api
+      .get("/it-courses")
+      .then((res) => setCourses(res.data.courses || [])) // ✅ Fixed: use res.data.courses
       .catch(() => setCourses([]));
   }, []);
 
+  // Group courses by level
   const groupedCourses = {
-    Beginner: courses.filter(c => c.category === "Beginner"),
-    Intermediate: courses.filter(c => c.category === "Intermediate"),
-    Advanced: courses.filter(c => c.category === "Advanced"),
+    Beginner: courses.filter((c) => c.level === "Beginner"),
+    Intermediate: courses.filter((c) => c.level === "Intermediate"),
+    Advanced: courses.filter((c) => c.level === "Advanced"),
   };
 
   return (
@@ -47,12 +50,12 @@ export default function ITNavbar() {
           </button>
 
           <div className="absolute left-1/2 -translate-x-1/2 top-full mt-3 hidden group-hover:grid grid-cols-3 gap-6 bg-white rounded-2xl shadow-2xl p-8 w-[900px] border border-gray-100 z-50">
-            {(["Beginner","Intermediate","Advanced"] as const).map(level => (
+            {(["Beginner", "Intermediate", "Advanced"] as const).map((level) => (
               <div key={level}>
                 <h4 className="text-orange-500 font-bold pb-2 border-b">{level}</h4>
                 <ul className="pt-3 space-y-2 text-gray-700 font-medium">
                   {groupedCourses[level].length > 0 ? (
-                    groupedCourses[level].map(course => (
+                    groupedCourses[level].map((course) => (
                       <li key={course._id}>
                         <Link href={`/course/it/${course.slug}`} className="hover:text-orange-500">
                           {course.title}
@@ -80,7 +83,11 @@ export default function ITNavbar() {
       <div className="hidden md:flex items-center gap-5">
         <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-64">
           <Search size={18} className="text-gray-500" />
-          <input type="text" placeholder="Search..." className="bg-transparent outline-none px-2 text-sm text-gray-700 w-full"/>
+          <input
+            type="text"
+            placeholder="Search..."
+            className="bg-transparent outline-none px-2 text-sm text-gray-700 w-full"
+          />
         </div>
         <Link href="/auth/login" className="bg-orange-500 text-white px-6 py-2 rounded-full font-semibold">
           Login / Register
@@ -89,17 +96,34 @@ export default function ITNavbar() {
 
       {/* Mobile Menu */}
       <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-gray-700">
-        {menuOpen ? <X size={28}/> : <Menu size={28}/>}
+        {menuOpen ? <X size={28} /> : <Menu size={28} />}
       </button>
 
       {menuOpen && (
         <div className="fixed top-16 left-0 w-full min-h-screen bg-white shadow-2xl p-6 flex flex-col gap-4 md:hidden z-[9999]">
-          {courses.length > 0 ? courses.map(course => (
-            <button key={course._id} className="text-left text-gray-700 font-medium hover:text-orange-500" onClick={() => { setMenuOpen(false); router.push(`/course/it/${course.slug}`) }}>
-              {course.title}
-            </button>
-          )) : <p className="text-gray-400 text-sm">No courses found</p>}
-          <button className="bg-orange-500 text-white py-3 rounded-lg text-center font-semibold mt-5" onClick={() => { setMenuOpen(false); router.push("/auth/login") }}>
+          {courses.length > 0 ? (
+            courses.map((course) => (
+              <button
+                key={course._id}
+                className="text-left text-gray-700 font-medium hover:text-orange-500"
+                onClick={() => {
+                  setMenuOpen(false);
+                  router.push(`/course/it/${course.slug}`);
+                }}
+              >
+                {course.title}
+              </button>
+            ))
+          ) : (
+            <p className="text-gray-400 text-sm">No courses found</p>
+          )}
+          <button
+            className="bg-orange-500 text-white py-3 rounded-lg text-center font-semibold mt-5"
+            onClick={() => {
+              setMenuOpen(false);
+              router.push("/auth/login");
+            }}
+          >
             Login / Register
           </button>
         </div>

@@ -37,7 +37,7 @@ export default function AddCourse() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded shadow">
+    <div className="max-w-xl mx-auto text-black p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Add New Course</h1>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input name="title" placeholder="Title" onChange={handleChange} className="w-full p-2 border rounded" />

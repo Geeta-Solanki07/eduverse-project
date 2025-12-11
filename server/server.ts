@@ -13,6 +13,8 @@ import itCourseRoutes from "./routes/itCourses";
 import userRoutes from "./routes/userRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
 import analyticsRoutes from "./routes/analyticsRoutes";
+import featuresRoutes from "./routes/featuresRoutes";
+
 
 dotenv.config();
 
@@ -45,6 +47,8 @@ app.use("/api/it-courses", itCourseRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin/settings", settingsRoutes);
 app.use("/api/admin/analytics", analyticsRoutes);
+app.use("/api/features", featuresRoutes);
+
 
 // Mongo + Server
 const PORT = process.env.PORT || 5000;
