@@ -2,6 +2,9 @@
   "name": "mern-backend",
   "version": "1.0.0",
   "main": "dist/server.js",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "seed": "ts-node seed.ts",
@@ -9,7 +12,7 @@
     "ac": "ts-node ac.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "deploy-build": "npm install && tsc"
+    "deploy-build": "npm install --include=dev && tsc"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
