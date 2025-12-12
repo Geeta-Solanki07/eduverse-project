@@ -79,9 +79,21 @@ export const listChaptersBySubject = async (req: Request, res: Response) => {
 };
 
 export const createChapter = async (req: Request, res: Response) => {
-  const ch = await Chapter.create(req.body); // subjectId required
-  res.json(ch);
+  try {
+    const { title, subjectId } = req.body;
+
+    if (!subjectId || subjectId.trim() === "") {
+      return res.status(400).json({ message: "subjectId is required" });
+    }
+
+    const chapter = await Chapter.create({ title, subjectId });
+    res.json({ message: "Chapter created", chapter });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
 };
+
 
 export const deleteChapter = async (req: Request, res: Response) => {
   await Chapter.findByIdAndDelete(req.params.id);
