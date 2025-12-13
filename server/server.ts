@@ -29,6 +29,8 @@ app.use(
     origin: [
       process.env.CLIENT_URL || "http://localhost:3000",
       "https://eduverse-project.vercel.app",
+            "https://eduverse-project.onrender.com"
+
     ],
     credentials: true,
   })

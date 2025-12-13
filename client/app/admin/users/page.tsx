@@ -20,7 +20,7 @@ export default function UsersPage() {
     try {
       setLoading(true);
       const res = await api.get("/admin/users");
-      setUsers(res.data.users || res.data); // safe fallback
+      setUsers(res.data.users || res.data);
     } catch (err) {
       console.error("Error fetching users:", err);
       setUsers([]);
@@ -34,11 +34,11 @@ export default function UsersPage() {
   }, []);
 
   const changeRole = async (id: string, role: string) => {
-    if (!confirm(`Are you sure you want to change this user's role to ${role}?`)) return;
+    if (!confirm(`Change role to ${role}?`)) return;
     try {
       setActionLoading(id);
       await api.put(`/admin/users/${id}/role`, { role });
-      await fetchUsers();
+      fetchUsers();
     } catch (err) {
       console.error("Error updating role:", err);
     } finally {
@@ -47,11 +47,11 @@ export default function UsersPage() {
   };
 
   const deleteUser = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+    if (!confirm("Delete this user?")) return;
     try {
       setActionLoading(id);
       await api.delete(`/admin/users/${id}`);
-      await fetchUsers();
+      fetchUsers();
     } catch (err) {
       console.error("Error deleting user:", err);
     } finally {
@@ -59,61 +59,54 @@ export default function UsersPage() {
     }
   };
 
-  if (loading) return <p className="text-gray-600">Loading users...</p>;
-
-  if (users.length === 0) return <p className="text-gray-600">No users found.</p>;
+  if (loading) return <p>Loading users...</p>;
+  if (users.length === 0) return <p>No users found.</p>;
 
   return (
-    <div className="text-black">
+    <div className="p-4 text-black">
       <h1 className="text-2xl font-bold mb-4">Users Management</h1>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-3 border">Name</th>
-              <th className="p-3 border">Email</th>
-              <th className="p-3 border">Role</th>
-              <th className="p-3 border">Joined</th>
-              <th className="p-3 border">Actions</th>
+
+      <table className="w-full border">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Email</th>
+            <th className="p-2 border">Role</th>
+            <th className="p-2 border">Joined</th>
+            <th className="p-2 border">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u) => (
+            <tr key={u._id}>
+              <td className="p-2 border">{u.name}</td>
+              <td className="p-2 border">{u.email}</td>
+              <td className="p-2 border">
+                <select
+                  value={u.role}
+                  disabled={!!actionLoading}
+                  onChange={(e) => changeRole(u._id, e.target.value)}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </td>
+              <td className="p-2 border">
+                {new Date(u.createdAt).toLocaleDateString()}
+              </td>
+              <td className="p-2 border">
+                <button
+                  disabled={actionLoading === u._id}
+                  onClick={() => deleteUser(u._id)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  {actionLoading === u._id ? "..." : "Delete"}
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id} className="hover:bg-gray-50">
-                <td className="p-3 border">{user.name}</td>
-                <td className="p-3 border">{user.email}</td>
-                <td className="p-3 border">
-                  <select
-                    value={user.role}
-                    disabled={!!actionLoading}
-                    onChange={(e) => changeRole(user._id, e.target.value)}
-                    className="border rounded px-2 py-1"
-                  >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </td>
-                <td className="p-3 border">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </td>
-                <td className="p-3 border">
-                  <button
-                    disabled={!!actionLoading}
-                    onClick={() => deleteUser(user._id)}
-                    className={`px-3 py-1 rounded text-white ${
-                      actionLoading === user._id
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-red-500 hover:bg-red-600"
-                    }`}
-                  >
-                    {actionLoading === user._id ? "Processing..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

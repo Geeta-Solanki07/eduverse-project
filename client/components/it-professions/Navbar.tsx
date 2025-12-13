@@ -89,7 +89,7 @@ export default function ITNavbar() {
             className="bg-transparent outline-none px-2 text-sm text-gray-700 w-full"
           />
         </div>
-        <Link href="/auth/login" className="bg-orange-500 text-white px-6 py-2 rounded-full font-semibold">
+        <Link href="/auth/register" className="bg-orange-500 text-white px-6 py-2 rounded-full font-semibold">
           Login / Register
         </Link>
       </div>
@@ -121,7 +121,7 @@ export default function ITNavbar() {
             className="bg-orange-500 text-white py-3 rounded-lg text-center font-semibold mt-5"
             onClick={() => {
               setMenuOpen(false);
-              router.push("/auth/login");
+              router.push("/auth/register");
             }}
           >
             Login / Register
