@@ -5,121 +5,113 @@ import Link from "next/link";
 
 export default function AboutPage() {
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-white text-gray-900">
 
-      {/* ===================== HERO SECTION ===================== */}
-      <section className="relative w-full bg-[#c5d1ff] pt-28 pb-20 text-center overflow-hidden">
-        {/* floating icons */}
+      {/* ================= HERO SECTION ================= */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-200 via-blue-100 to-purple-200 pt-32 pb-24 text-center">
         <Image
           src="/assets/it/python.png"
-          alt="python icon"
+          alt="python"
           width={120}
           height={120}
-          className="absolute top-16 left-10 w-20 md:w-28 opacity-80 animate-bounce"
+          className="absolute top-20 left-10 opacity-70 animate-bounce hidden md:block"
         />
         <Image
           src="/assets/it/html.png"
-          alt="html icon"
+          alt="html"
           width={120}
           height={120}
-          className="absolute bottom-10 right-10 w-20 md:w-28 opacity-80 animate-pulse"
+          className="absolute bottom-10 right-10 opacity-70 animate-pulse hidden md:block"
         />
 
-        <h1 className="text-3xl md:text-5xl font-bold leading-snug text-gray-900">
-          Empowering the Next Generation of Developers
+        <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
+          Empowering the Next <br />
+          <span className="text-indigo-700">Generation of Developers</span>
         </h1>
 
-        <p className="mt-4 max-w-2xl mx-auto text-gray-700 text-sm md:text-base">
-          Dousoft Eduverse is revolutionizing tech education through project-based
-          learning, expert mentorship, and industry-aligned curriculum.
+        <p className="mt-6 max-w-3xl mx-auto text-gray-700 text-lg">
+          Dousoft Eduverse bridges the gap between education and industry through
+          hands-on learning, expert mentorship, and real-world projects.
         </p>
 
         <Link
-          href="#story-top"
-          className="inline-block mt-6 px-6 py-3 bg-orange-600 text-white rounded-full shadow-md hover:bg-orange-700 transition"
+          href="#story"
+          className="inline-block mt-8 px-8 py-4 bg-orange-600 text-white rounded-full text-lg font-semibold shadow-lg hover:bg-orange-700 transition"
         >
-          Explore Our Story
+          Discover Our Journey →
         </Link>
       </section>
 
-      {/* ===================== OUR STORY HEADING + IMAGE ===================== */}
-      <section id="story-top" className="w-full text-center max-w-5xl mx-auto px-6 py-16">
-        
-        {/* Orange heading */}
-        <h2 className="text-orange-600 font-bold tracking-widest text-sm">
+      {/* ================= STORY SECTION ================= */}
+      <section id="story" className="max-w-6xl mx-auto px-6 py-24 text-center">
+        <span className="text-orange-600 font-semibold tracking-widest text-sm">
           OUR STORY
+        </span>
+
+        <h2 className="text-4xl md:text-5xl font-bold mt-4">
+          From Passion to a Global Platform
         </h2>
 
-        {/* Big Title */}
-        <h3 className="text-4xl md:text-5xl font-extrabold mt-3 text-gray-900">
-          A Journey of Innovation & Learning
-        </h3>
+        <p className="mt-6 max-w-4xl mx-auto text-gray-700 text-lg leading-relaxed">
+          Founded in 2018, Dousoft Eduverse began as a small initiative to help
+          students gain practical technical skills. Today, it has evolved into a
+          modern online learning platform serving thousands of learners worldwide.
+        </p>
 
-        {/* Attractive Image */}
-        <div className="w-full mt-10">
+        <div className="mt-14">
           <Image
             src="/assets/it/about-us.jpg"
-            alt="About Eduverse Team"
+            alt="Eduverse Team"
             width={1400}
             height={700}
-            className="rounded-3xl shadow-2xl object-cover w-full h-[380px] md:h-[500px]"
+            className="rounded-3xl shadow-2xl w-full h-[420px] md:h-[520px] object-cover"
           />
         </div>
       </section>
 
-      {/* ===================== STORY / MISSION SECTION (CENTERED) ===================== */}
-      <section
-        id="mission"
-        className="flex flex-col items-center text-center max-w-4xl mx-auto px-6 py-20"
-      >
-        <h2 className="text-orange-600 font-semibold text-sm tracking-widest">
-          OUR STORY CONTINUES
-        </h2>
-
-        <h3 className="text-4xl md:text-5xl font-extrabold text-gray-900 mt-3 leading-tight">
-          From Passion to Platform
-        </h3>
-
-        <p className="mt-6 text-gray-700 text-lg leading-relaxed">
-          Founded in 2018, Dousoft Eduverse began as a small initiative to bridge 
-          the gap between academic learning and real-world software development 
-          skills. What started as weekend workshops has grown into a premier online 
-          learning platform serving thousands of students worldwide.
-        </p>
-
-        <p className="mt-6 text-gray-700 text-lg leading-relaxed">
-          Our founders, seasoned developers themselves, recognized the need for 
-          practical, hands-on education that prepares students for the tech industry. 
-          Today, we are proud to be at the forefront of innovative technical learning.
-        </p>
-      </section>
-
-      {/* ===================== VALUES SECTION ===================== */}
-      <section className="py-20 bg-white">
-        <div className="text-center max-w-3xl mx-auto px-6">
-          <h2 className="text-indigo-600 font-semibold text-sm tracking-widest">
-            OUR VALUES
-          </h2>
-
-          <h3 className="text-4xl md:text-5xl font-extrabold mt-2 text-gray-900">
-            What Guides Everything We Do
+      {/* ================= MISSION SECTION ================= */}
+      <section className="bg-gray-50 py-24">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <h3 className="text-indigo-600 font-semibold tracking-widest text-sm">
+            OUR MISSION
           </h3>
 
-          <p className="mt-4 text-gray-600 text-lg">
-            These core principles shape our curriculum, teaching methods, and
-            student interactions.
+          <h2 className="text-4xl md:text-5xl font-extrabold mt-4">
+            Learning That Builds Careers
+          </h2>
+
+          <p className="mt-6 text-gray-700 text-lg leading-relaxed">
+            We focus on practical, job-ready education. Our curriculum is designed
+            by industry experts to ensure learners gain skills that matter in the
+            real world.
+          </p>
+        </div>
+      </section>
+
+      {/* ================= VALUES SECTION ================= */}
+      <section className="py-24 bg-white">
+        <div className="text-center max-w-4xl mx-auto px-6">
+          <h3 className="text-indigo-600 font-semibold tracking-widest text-sm">
+            OUR VALUES
+          </h3>
+
+          <h2 className="text-4xl md:text-5xl font-extrabold mt-4">
+            What Drives Eduverse
+          </h2>
+
+          <p className="mt-6 text-gray-600 text-lg">
+            Our core principles define how we teach, build, and grow.
           </p>
         </div>
 
-        {/* Values Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto mt-16 px-6">
-          {values.map((val, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto mt-16 px-6">
+          {values.map((val, i) => (
             <div
-              key={idx}
-              className="bg-[#c5d1ff] p-10 rounded-2xl shadow-md hover:shadow-xl transition"
+              key={i}
+              className="bg-gradient-to-br from-indigo-100 to-blue-100 p-10 rounded-3xl shadow-md hover:shadow-xl transition"
             >
-              <div className="text-4xl mb-4 text-indigo-700">{val.icon}</div>
-              <h4 className="text-2xl font-semibold mb-3 text-gray-900">
+              <div className="text-5xl mb-4">{val.icon}</div>
+              <h4 className="text-2xl font-semibold mb-3">
                 {val.title}
               </h4>
               <p className="text-gray-700 text-lg leading-relaxed">
@@ -134,10 +126,34 @@ export default function AboutPage() {
 }
 
 const values = [
-  { icon: "🤝", title: "Student Success First", desc: "Every decision we make is measured against its impact on student outcomes." },
-  { icon: "💻", title: "Practical Learning", desc: "We emphasize hands-on, project-based education with real applications." },
-  { icon: "👨‍🏫", title: "Expert Instruction", desc: "Our instructors bring current, real-world experience into every lesson." },
-  { icon: "🚀", title: "Continuous Innovation", desc: "We constantly update our curriculum to reflect the latest tech trends." },
-  { icon: "👥", title: "Community Focus", desc: "We foster a supportive community where students collaborate and grow." },
-  { icon: "🎯", title: "Career Outcomes", desc: "We provide extensive support to help students achieve career goals." },
+  {
+    icon: "🤝",
+    title: "Student First",
+    desc: "Every decision we take is measured by how it benefits our learners."
+  },
+  {
+    icon: "💻",
+    title: "Practical Learning",
+    desc: "Hands-on projects that mirror real-world industry challenges."
+  },
+  {
+    icon: "👨‍🏫",
+    title: "Expert Mentorship",
+    desc: "Learn from professionals actively working in the tech industry."
+  },
+  {
+    icon: "🚀",
+    title: "Innovation",
+    desc: "We constantly evolve to keep pace with modern technologies."
+  },
+  {
+    icon: "👥",
+    title: "Community",
+    desc: "A collaborative ecosystem where learners grow together."
+  },
+  {
+    icon: "🎯",
+    title: "Career Outcomes",
+    desc: "Our success is defined by the careers our learners build."
+  }
 ];

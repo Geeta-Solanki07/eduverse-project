@@ -8,84 +8,122 @@ import Chapter from "../models/Chapter";
 
 // USERS
 export const listUsers = async (req: Request, res: Response) => {
-  const users = await User.find().select("-password").sort({ createdAt: -1 });
-  res.json(users);
+  try {
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const changeUserRole = async (req: Request, res: Response) => {
-  const user = await User.findById(req.params.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  user.role = req.body.role || user.role;
-  await user.save();
-  res.json(user);
+    user.role = req.body.role || user.role;
+    await user.save();
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
-  await User.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // CLASSES
 export const listClasses = async (req: Request, res: Response) => {
-  const classes = await AcademicClass.find().sort({ createdAt: -1 });
-  res.json(classes);
+  try {
+    const classes = await AcademicClass.find().sort({ createdAt: -1 });
+    res.json(classes);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const createClass = async (req: Request, res: Response) => {
-  const cls = await AcademicClass.create(req.body);
-  res.json(cls);
+  try {
+    const cls = await AcademicClass.create(req.body);
+    res.json(cls);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const deleteClass = async (req: Request, res: Response) => {
-  await AcademicClass.findByIdAndDelete(req.params.id);
+  try {
+    await AcademicClass.findByIdAndDelete(req.params.id);
 
-  // Cascade delete
-  const subjects = await Subject.find({ classId: req.params.id });
-  const subIds = subjects.map(s => s._id);
-  await Chapter.deleteMany({ subjectId: { $in: subIds } });
-  await Subject.deleteMany({ classId: req.params.id });
+    // Cascade delete subjects & chapters
+    const subjects = await Subject.find({ classId: req.params.id });
+    const subIds = subjects.map(s => s._id);
+    await Chapter.deleteMany({ subjectId: { $in: subIds } });
+    await Subject.deleteMany({ classId: req.params.id });
 
-  res.json({ success: true });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // SUBJECTS
 export const listSubjectsByClass = async (req: Request, res: Response) => {
-  const classId = req.query.classId;
-  const subjects = classId
-    ? await Subject.find({ classId })
-    : await Subject.find();
-  res.json(subjects);
+  try {
+    const classId = req.query.classId;
+    const subjects = classId
+      ? await Subject.find({ classId })
+      : await Subject.find();
+    res.json(subjects);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const createSubject = async (req: Request, res: Response) => {
-  const sub = await Subject.create(req.body); // classId required
-  res.json(sub);
+  try {
+    const sub = await Subject.create(req.body);
+    res.json(sub);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const deleteSubject = async (req: Request, res: Response) => {
-  await Subject.findByIdAndDelete(req.params.id);
-  await Chapter.deleteMany({ subjectId: req.params.id });
-  res.json({ success: true });
+  try {
+    await Subject.findByIdAndDelete(req.params.id);
+    await Chapter.deleteMany({ subjectId: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // CHAPTERS
 export const listChaptersBySubject = async (req: Request, res: Response) => {
-  const subjectId = req.query.subjectId;
-  const chapters = subjectId
-    ? await Chapter.find({ subjectId }).sort({ createdAt: 1 })
-    : await Chapter.find().sort({ createdAt: 1 });
-  res.json(chapters);
+  try {
+    const subjectId = req.query.subjectId;
+    const chapters = subjectId
+      ? await Chapter.find({ subjectId }).sort({ createdAt: 1 })
+      : await Chapter.find().sort({ createdAt: 1 });
+    res.json(chapters);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const createChapter = async (req: Request, res: Response) => {
   try {
     const { title, subjectId } = req.body;
-
-    if (!subjectId || subjectId.trim() === "") {
-      return res.status(400).json({ message: "subjectId is required" });
+    if (!subjectId || !title) {
+      return res.status(400).json({ message: "title & subjectId required" });
     }
-
     const chapter = await Chapter.create({ title, subjectId });
     res.json({ message: "Chapter created", chapter });
   } catch (err: any) {
@@ -94,26 +132,41 @@ export const createChapter = async (req: Request, res: Response) => {
   }
 };
 
-
 export const deleteChapter = async (req: Request, res: Response) => {
-  await Chapter.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+  try {
+    await Chapter.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // IT COURSES
 export const listITCourses = async (req: Request, res: Response) => {
-  const courses = await ITCourse.find().sort({ createdAt: -1 });
-  res.json(courses);
+  try {
+    const courses = await ITCourse.find().sort({ createdAt: -1 });
+    res.json(courses);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const createITCourse = async (req: Request, res: Response) => {
-  const course = await ITCourse.create(req.body);
-  res.json(course);
+  try {
+    const course = await ITCourse.create(req.body);
+    res.json(course);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 export const deleteITCourse = async (req: Request, res: Response) => {
-  await ITCourse.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+  try {
+    await ITCourse.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 // SETTINGS
@@ -125,8 +178,8 @@ export const updateSettings = async (req: Request, res: Response) => {
   res.json({ success: true });
 };
 
-// ADMIN STATS
-export const getStats = async (req: Request, res: Response) => {
+// DASHBOARD STATS
+export const getDashboardStats = async (req: Request, res: Response) => {
   try {
     const totalUsers = await User.countDocuments();
     const admins = await User.countDocuments({ role: "admin" });
@@ -135,24 +188,14 @@ export const getStats = async (req: Request, res: Response) => {
     const totalCourses = await ITCourse.countDocuments();
     const totalOrders = await Order.countDocuments();
 
-    let revenue = 0;
     const orders = await Order.find();
-    orders.forEach((o: any) => {
-      revenue += o.amount || 0;
-    });
+    const revenue = orders.reduce((sum, o: any) => sum + (o.amount || 0), 0);
 
     res.json({
-      stats: {
-        totalUsers,
-        admins,
-        normalUsers,
-        totalCourses,
-        totalOrders,
-        revenue,
-      },
+      stats: { totalUsers, admins, normalUsers, totalCourses, totalOrders, revenue },
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };

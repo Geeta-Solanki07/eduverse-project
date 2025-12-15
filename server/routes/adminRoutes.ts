@@ -1,4 +1,3 @@
-// server/routes/adminRoutes.ts
 import express from "express";
 import { protect, isAdmin } from "../middleware/auth";
 import * as ctrl from "../controllers/adminController";
@@ -33,5 +32,8 @@ router.delete("/it-courses/:id", protect, isAdmin, ctrl.deleteITCourse);
 // SETTINGS
 router.get("/settings", protect, isAdmin, ctrl.getSettings);
 router.put("/settings", protect, isAdmin, ctrl.updateSettings);
+
+// DASHBOARD STATS
+router.get("/stats", protect, isAdmin, ctrl.getDashboardStats);
 
 export default router;

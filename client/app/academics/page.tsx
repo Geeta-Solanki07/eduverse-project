@@ -23,22 +23,22 @@ type ClassItem = {
 
 export default function AcademicsPage() {
   const [classes, setClasses] = useState<ClassItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api
       .get("/academics/classes")
-      .then((res) => setClasses(res.data.classes))
-      .catch((err) => console.log(err))
-      .finally(() => setLoading(false));
+      .then((res) => {
+        setClasses(res.data.classes || res.data || []);
+      })
+      .catch((err) => {
+        console.error("Academics fetch error:", err);
+        setClasses([]);
+      });
   }, []);
 
   const elementary = classes.filter((c) => c.category === "elementary");
   const junior = classes.filter((c) => c.category === "junior");
   const senior = classes.filter((c) => c.category === "senior");
-
-  if (loading)
-    return <p className="text-center py-20 text-gray-700">Loading...</p>;
 
   return (
     <div className="bg-white font-poppins text-gray-800">
@@ -47,20 +47,27 @@ export default function AcademicsPage() {
       <AboutSection />
       <FeaturesSection />
 
-      <CoursesSection
-        sectionTitle="Elementary Classes (1st - 5th)"
-        courses={elementary}
-      />
+      {/* Show sections only if data exists (real platform behavior) */}
+      {elementary.length > 0 && (
+        <CoursesSection
+          sectionTitle="Elementary Classes (1st - 5th)"
+          courses={elementary}
+        />
+      )}
 
-      <CoursesSection
-        sectionTitle="Junior Classes (6th - 8th)"
-        courses={junior}
-      />
+      {junior.length > 0 && (
+        <CoursesSection
+          sectionTitle="Junior Classes (6th - 8th)"
+          courses={junior}
+        />
+      )}
 
-      <CoursesSection
-        sectionTitle="Senior Classes (9th - 12th)"
-        courses={senior}
-      />
+      {senior.length > 0 && (
+        <CoursesSection
+          sectionTitle="Senior Classes (9th - 12th)"
+          courses={senior}
+        />
+      )}
 
       <LearnersSection />
       <StudyMaterialsSection />

@@ -11,31 +11,24 @@ const api = axios.create({
   },
 });
 
-// Attach Authorization header
-api.interceptors.request.use(
-  (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+// Attach token
+api.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  }
+  return config;
+});
 
-// Global 401 handler
+// Handle expired login
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 401) {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("name");
-        window.location.href = "/login";
-      }
+      localStorage.clear();
+      window.location.href = "/auth/login";
     }
     return Promise.reject(err);
   }

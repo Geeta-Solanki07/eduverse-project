@@ -6,76 +6,62 @@ import api from "@/lib/api";
 import useAuthRedirect from "@/app/hooks/useAuthRedirect";
 
 export default function LoginPage() {
-  useAuthRedirect();
-
+  const ready = useAuthRedirect();
   const router = useRouter();
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const handleChange = (e: any) =>
+  if (!ready) return null;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg("");
 
     try {
-      const res = await api.post("/auth/login", form);
+      const { data } = await api.post("/auth/login", form);
 
-      // ✅ Save in localStorage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.user.role);
-      localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.user.role);
+      localStorage.setItem("name", data.user.name);
 
-      // ✅ ALSO save in cookie for middleware
-      document.cookie = `token=${res.data.token}; path=/`;
+      document.cookie = `token=${data.token}; path=/`;
 
-      setMsg("✅ Login successful...");
-
-      setTimeout(() => {
-        if (res.data.user.role === "admin") {
-          router.replace("/admin/dashboard");
-        } else {
-          router.replace("/user/dashboard");
-        }
-      }, 500);
+      data.user.role === "admin"
+        ? router.replace("/admin/dashboard")
+        : router.replace("/user/dashboard");
     } catch (err: any) {
-      setMsg("❌ " + (err?.response?.data?.message || "Invalid credentials"));
+      setMsg(err?.response?.data?.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row text-black">
+    <div className="text-black min-h-screen flex flex-col md:flex-row bg-gray-50 text-black">
 
-      <div className="md:hidden bg-indigo-600 text-white py-10 flex justify-center">
-        <img src="/assets/login.webp" className="w-52" />
+      {/* LEFT IMAGE */}
+      <div className="hidden md:flex w-1/2 bg-indigo-600 items-center justify-center">
+        <img src="/assets/login.webp" className="w-96" />
       </div>
 
-      <div className="hidden md:flex w-1/2 bg-indigo-600 text-white items-center justify-center">
-        <div className="text-center px-6">
-          <img src="/assets/login.webp" className="w-80 mx-auto" />
-          <h1 className="text-3xl font-semibold mt-6">Welcome Back 👋</h1>
-          <p className="opacity-90 text-sm mt-2">
-            Continue your journey with Eduverse
-          </p>
-        </div>
-      </div>
-
-      <div className="flex w-full md:w-1/2 items-center justify-center bg-gray-50 px-4 py-10">
+      {/* FORM */}
+      <div className="flex w-full md:w-1/2 items-center justify-center px-4">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-xl rounded-xl p-6 sm:p-8 w-full max-w-md"
+          className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md"
         >
-          <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-6">
+          <h2 className="text-3xl font-semibold text-center mb-6">
             Sign In
           </h2>
 
           {msg && (
-            <p className="mb-4 text-sm p-2 bg-gray-100 rounded text-center">
+            <p className="text-center mb-4 text-sm bg-gray-100 p-2 rounded">
               {msg}
             </p>
           )}
@@ -84,27 +70,25 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
-            value={form.email}
+            placeholder="Email"
+            className="w-full border p-3 mb-4 rounded"
             onChange={handleChange}
-            className="w-full border mb-4 p-3 rounded text-sm"
-            placeholder="Email address"
           />
 
           <input
             name="password"
             type="password"
             required
-            value={form.password}
-            onChange={handleChange}
-            className="w-full border mb-4 p-3 rounded text-sm"
             placeholder="Password"
+            className="w-full border p-3 mb-6 rounded"
+            onChange={handleChange}
           />
 
           <button
             disabled={loading}
-            className="w-full py-3 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
+            className="w-full bg-indigo-600 text-white py-3 rounded"
           >
-            {loading ? "Loading..." : "Sign In"}
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
       </div>
