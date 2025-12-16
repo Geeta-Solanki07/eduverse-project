@@ -3,13 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
-import useAuthRedirect from "@/app/hooks/useAuthRedirect";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
 
 export default function RegisterPage() {
-  const ready = useAuthRedirect();
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -18,23 +14,12 @@ export default function RegisterPage() {
     password: "",
   });
 
-  const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState("");
 
-  if (!ready) return null;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-
-    if (e.target.name === "password") {
-      const pass = e.target.value;
-      if (pass.length < 6) setPasswordStrength("Weak");
-      else if (pass.length < 10) setPasswordStrength("Medium");
-      else setPasswordStrength("Strong");
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +28,17 @@ export default function RegisterPage() {
 
     try {
       await api.post("/auth/register", form);
+
+      // 🔥 VERY IMPORTANT (fix deploy bug)
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("name");
+
       setMsg("✅ Account created successfully. Redirecting to login...");
-      setTimeout(() => router.push("/auth/login"), 1200);
+
+      setTimeout(() => {
+        router.replace("/auth/login");
+      }, 1200);
     } catch (err: any) {
       setMsg(err?.response?.data?.message || "❌ Registration failed");
     } finally {
@@ -52,24 +46,13 @@ export default function RegisterPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = "/auth/google";
-  };
-
-  const handleGithubLogin = () => {
-    window.location.href = "/auth/github";
-  };
-
   return (
-    <div className="min-h-screen text-black flex flex-col md:flex-row bg-gray-50">
-
-      {/* LEFT IMAGE */}
+    <div className="min-h-screen flex bg-gray-50 text-black">
       <div className="hidden md:flex w-1/2 bg-indigo-600 items-center justify-center">
-        <img src="/assets/login.webp" alt="Register" className="w-96" />
+        <img src="/assets/login.webp" className="w-96" />
       </div>
 
-      {/* RIGHT FORM */}
-      <div className="flex w-full md:w-1/2 items-center justify-center px-4">
+      <div className="flex w-full md:w-1/2 items-center justify-center">
         <form
           onSubmit={handleSubmit}
           className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md"
@@ -79,11 +62,7 @@ export default function RegisterPage() {
           </h2>
 
           {msg && (
-            <p
-              className={`text-center mb-4 text-sm p-2 rounded ${
-                msg.includes("✅") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-              }`}
-            >
+            <p className="text-center mb-4 text-sm bg-gray-100 p-2 rounded">
               {msg}
             </p>
           )}
@@ -93,7 +72,6 @@ export default function RegisterPage() {
             required
             placeholder="Full Name"
             className="w-full border p-3 mb-4 rounded"
-            value={form.name}
             onChange={handleChange}
           />
 
@@ -103,12 +81,10 @@ export default function RegisterPage() {
             required
             placeholder="Email"
             className="w-full border p-3 mb-4 rounded"
-            value={form.email}
             onChange={handleChange}
           />
 
-          {/* Password Field */}
-          <div className="relative mb-2">
+          <div className="relative mb-6">
             <input
               name="password"
               type={showPassword ? "text" : "password"}
@@ -116,71 +92,28 @@ export default function RegisterPage() {
               minLength={6}
               placeholder="Password"
               className="w-full border p-3 rounded pr-10"
-              value={form.password}
               onChange={handleChange}
             />
             <span
-              className="absolute right-3 top-3 cursor-pointer text-gray-500"
+              className="absolute right-3 top-3 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
+              {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
             </span>
           </div>
 
-          {/* Password Strength */}
-          {form.password && (
-            <p className={`text-sm mb-4 ${
-              passwordStrength === "Weak"
-                ? "text-red-600"
-                : passwordStrength === "Medium"
-                ? "text-yellow-600"
-                : "text-green-600"
-            }`}>
-              Password Strength: {passwordStrength}
-            </p>
-          )}
-
           <button
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-3 rounded hover:bg-indigo-700 transition disabled:opacity-50"
+            className="w-full bg-indigo-600 text-white py-3 rounded"
           >
             {loading ? "Creating..." : "Register"}
           </button>
 
-          {/* OR Divider */}
-          {/* <div className="flex items-center my-4">
-            <hr className="flex-grow border-gray-300" />
-            <span className="px-2 text-gray-400 text-sm">OR</span>
-            <hr className="flex-grow border-gray-300" />
-          </div> */}
-
-          {/* OAuth Buttons */}
-          {/* <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              className="w-full border py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-100 transition"
-            >
-              <FcGoogle size={20} />
-              Continue with Google
-            </button>
-
-            <button
-              type="button"
-              onClick={handleGithubLogin}
-              className="w-full border py-2 rounded flex items-center justify-center gap-2 hover:bg-gray-100 transition"
-            >
-              <FaGithub size={20} />
-              Continue with GitHub
-            </button>
-          </div> */}
-
-          {/* LOGIN LINK */}
           <p className="text-center text-sm mt-4">
             Already have an account?{" "}
             <span
               onClick={() => router.push("/auth/login")}
-              className="text-indigo-600 font-medium cursor-pointer hover:underline"
+              className="text-indigo-600 cursor-pointer hover:underline"
             >
               Login
             </span>

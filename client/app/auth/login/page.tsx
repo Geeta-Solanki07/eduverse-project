@@ -1,19 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
-import useAuthRedirect from "@/app/hooks/useAuthRedirect";
 
 export default function LoginPage() {
-  const ready = useAuthRedirect();
   const router = useRouter();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  if (!ready) return null;
+  // ✅ Auto redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (token && role) {
+      role === "admin"
+        ? router.replace("/admin/dashboard")
+        : router.replace("/user/dashboard");
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,12 +34,14 @@ export default function LoginPage() {
     try {
       const { data } = await api.post("/auth/login", form);
 
+      // ✅ Save auth
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.user.role);
       localStorage.setItem("name", data.user.name);
 
       document.cookie = `token=${data.token}; path=/`;
 
+      // ✅ Role based redirect
       data.user.role === "admin"
         ? router.replace("/admin/dashboard")
         : router.replace("/user/dashboard");
@@ -43,25 +53,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="text-black min-h-screen flex flex-col md:flex-row bg-gray-50 text-black">
-
-      {/* LEFT IMAGE */}
+    <div className="min-h-screen flex bg-gray-50 text-black">
       <div className="hidden md:flex w-1/2 bg-indigo-600 items-center justify-center">
         <img src="/assets/login.webp" className="w-96" />
       </div>
 
-      {/* FORM */}
-      <div className="flex w-full md:w-1/2 items-center justify-center px-4">
+      <div className="flex w-full md:w-1/2 items-center justify-center">
         <form
           onSubmit={handleSubmit}
           className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md"
         >
-          <h2 className="text-3xl font-semibold text-center mb-6">
-            Sign In
-          </h2>
+          <h2 className="text-3xl font-semibold text-center mb-6">Sign In</h2>
 
           {msg && (
-            <p className="text-center mb-4 text-sm bg-gray-100 p-2 rounded">
+            <p className="text-center mb-4 text-sm bg-red-100 text-red-600 p-2 rounded">
               {msg}
             </p>
           )}

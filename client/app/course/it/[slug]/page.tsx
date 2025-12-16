@@ -101,7 +101,7 @@ export default function SingleITCoursePage() {
             {/* RIGHT IMAGE */}
             <div className="flex justify-center">
               <Image
-                src={course.image || "/assets/it/default-course.png"}
+                src={course.image || "/assets/it/about.png"}
                 alt={course.title}
                 width={550}
                 height={400}

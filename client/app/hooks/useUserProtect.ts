@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export default function useAdminProtect() {
+export default function useUserProtect() {
   const router = useRouter();
 
   useEffect(() => {
@@ -15,8 +15,8 @@ export default function useAdminProtect() {
       return;
     }
 
-    if (role !== "admin") {
-      router.replace("/user/dashboard");
+    if (role !== "user") {
+      router.replace("/admin/dashboard");
     }
   }, [router]);
 }
