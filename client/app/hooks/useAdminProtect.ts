@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function useAdminProtect() {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,6 +18,12 @@ export default function useAdminProtect() {
 
     if (role !== "admin") {
       router.replace("/user/dashboard");
+      return;
     }
+
+    // ✅ admin verified
+    setReady(true);
   }, [router]);
+
+  return ready;
 }

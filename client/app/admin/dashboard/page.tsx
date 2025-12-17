@@ -18,7 +18,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function AdminDashboardPage() {
-  useAdminProtect();
+  const ready = useAdminProtect(); // 🔥 VERY IMPORTANT
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -48,10 +48,14 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
+    if (!ready) return;
+
     fetchStats();
-    const interval = setInterval(fetchStats, 10000); // Auto-refresh
+    const interval = setInterval(fetchStats, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [ready]);
+
+  if (!ready) return null; // ❌ blank until auth confirmed
 
   const chartData = {
     labels: ["Users", "Admins", "Normal Users", "Courses", "Orders"],
@@ -77,34 +81,25 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="p-6 text-black font-bold">
+    <div className="p-6 text-black">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white p-6 rounded shadow text-center">
-          <h2 className="text-lg font-medium">Total Users</h2>
-          <p className="text-2xl font-bold">{stats.totalUsers}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow text-center">
-          <h2 className="text-lg font-medium">Total Courses</h2>
-          <p className="text-2xl font-bold">{stats.totalCourses}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow text-center">
-          <h2 className="text-lg font-medium">Revenue</h2>
-          <p className="text-2xl font-bold">${stats.revenue}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow text-center">
-          <h2 className="text-lg font-medium">Total Orders</h2>
-          <p className="text-2xl font-bold">{stats.totalOrders}</p>
-        </div>
-        <div className="bg-white p-6 rounded shadow text-center">
-          <h2 className="text-lg font-medium">Admins</h2>
-          <p className="text-2xl font-bold">{stats.admins}</p>
-        </div>
+        {[
+          ["Total Users", stats.totalUsers],
+          ["Total Courses", stats.totalCourses],
+          ["Revenue", `$${stats.revenue}`],
+          ["Total Orders", stats.totalOrders],
+          ["Admins", stats.admins],
+        ].map(([title, value]) => (
+          <div key={title} className="bg-white p-6 rounded shadow text-center">
+            <h2 className="text-lg">{title}</h2>
+            <p className="text-2xl font-bold">{value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="bg-white p-6 rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Platform Stats Overview</h2>
         <Bar data={chartData} />
       </div>
     </div>
