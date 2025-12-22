@@ -1,18 +1,22 @@
-import express from "express";
+import { Router } from "express";
 import ITCourse from "../models/ITCourse";
 
-const router = express.Router();
+const router = Router();
 
-// Public IT courses list
+// GET all IT courses
 router.get("/", async (req, res) => {
   const courses = await ITCourse.find().sort({ createdAt: -1 });
-  res.json({ courses }); // return as object for consistency
+  res.json({ courses });
 });
 
-// GET single course by slug
+// GET single IT course by slug
 router.get("/:slug", async (req, res) => {
-  const course = await ITCourse.findOne({ slug: req.params.slug }); // 🔑 use slug
-  if (!course) return res.status(404).json({ message: "Course not found" });
+  const course = await ITCourse.findOne({ slug: req.params.slug });
+
+  if (!course) {
+    return res.status(404).json({ message: "Course not found" });
+  }
+
   res.json({ course });
 });
 

@@ -9,3 +9,4 @@ router.get("/classes/:classId/subjects", ctrl.getSubjectsForClass);
 router.get("/subjects/:subjectId/chapters", ctrl.getChaptersForSubject);
 
 export default router;
+
